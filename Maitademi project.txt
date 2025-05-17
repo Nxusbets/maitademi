@@ -1,0 +1,20 @@
+Rellenos 2 tipos
+
+- Basico - mermeladas, crema batida o pastelera
+- Especial - cajeta con nuez, crema de avellanas, fresas con crema, duraznos con crema, ganache de chocolate, flan napolitano, crema de queso, 
+
+Sabor
+
+quitar frutos
+vainilla con nuez
+marmoleado(mantequilla-chocolate)
+tres leches(vainilla,chocolate, mocca)
+
+
+tamaño cambiar a porciones
+pequeño 8 a 10
+mediano 11 a 15
+grande 16 a 20
+extra grande 21 a 25
+jumbo 26 a 30
+mas de 30 porciones se cotiza aparte.
