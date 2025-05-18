@@ -11,7 +11,7 @@ import Footer from './components/Footer';
 import { theme } from './theme';
 import './App.css';
 import Testimonials from './components/Testimonials';
-import Faqs from './pages/Faqs';
+import Faqs from './pages/faqs';
 import PromotionsBanner from './components/PromotionsBanner';
 
 
@@ -22,12 +22,14 @@ function App() {
         <div className="App">
           <Navbar />
           <Routes>
-            <Route path="/" element={<>
-              <Home />
-              <PromotionsBanner />
-              <Testimonials />
-              <Faqs />
-            </>} />
+            <Route path="/" element={
+              <>
+                <Home />
+                <PromotionsBanner />
+                <Testimonials />
+                <Faqs />
+              </>
+            } />
             <Route path="/products" element={<Products />} />
             <Route path="/custom-cake" element={<CustomCake />} />
             <Route path="/contact" element={<Contact />} />

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { View, Heading, Card, Text, Button } from '@aws-amplify/ui-react';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
+// Asegúrate de que el nombre de la función comience con mayúscula
 function Faqs() {
   const [openItem, setOpenItem] = useState(null);
   
@@ -64,5 +65,5 @@ function Faqs() {
   );
 }
 
-// Añadir esta línea para tener una exportación predeterminada
+// ¡Asegúrate de que esta línea exista!
 export default Faqs;
