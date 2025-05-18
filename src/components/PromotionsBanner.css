@@ -1,0 +1,98 @@
+.promo-banner {
+  margin: 2rem 0;
+  position: relative;
+  overflow: hidden;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(219, 112, 147, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.promo-banner:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(219, 112, 147, 0.25);
+}
+
+.promo-badge {
+  background-color: #DB7093 !important;
+  color: white !important;
+  padding: 0.3rem 1rem !important;
+  border-radius: 20px !important;
+  letter-spacing: 1px;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.promo-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  margin: 0.5rem 0;
+  color: #DB7093;
+}
+
+.promo-code {
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 0.5rem 1.5rem;
+  border-radius: 25px;
+  border: 2px dashed #DB7093;
+  margin: 0.5rem 0;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.promo-description {
+  font-size: 1.1rem;
+  margin: 0.5rem 0 1rem;
+  max-width: 80%;
+}
+
+.promo-button {
+  margin-top: 1rem;
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  transition: transform 0.2s ease;
+}
+
+.promo-button:hover {
+  transform: scale(1.05);
+}
+
+.promo-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.promo-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: rgba(219, 112, 147, 0.3);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.promo-indicator.active {
+  background-color: #DB7093;
+  width: 25px;
+  border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  .promo-title {
+    font-size: 1.4rem;
+  }
+  
+  .promo-description {
+    font-size: 0.9rem;
+    max-width: 95%;
+  }
+  
+  .promo-code {
+    padding: 0.4rem 1rem;
+  }
+}

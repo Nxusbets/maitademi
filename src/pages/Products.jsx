@@ -34,6 +34,13 @@ const Products = () => {
     }
   ];
 
+  // Función para generar el enlace de WhatsApp con el pedido
+  const generateWhatsAppLink = (product) => {
+    const phoneNumber = "523326827809"; // Reemplaza con tu número de WhatsApp configurado
+    const message = `Hola, me gustaría solicitar: ${product.name} - $${product.price} MXN`;
+    return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+  };
+
   return (
     <Flex direction="column" padding="medium">
       <Heading level={1} textAlign="center">
@@ -64,8 +71,11 @@ const Products = () => {
               >
                 ${product.price} MXN
               </Text>
-              <Button variation="primary">
-                Agregar al Carrito
+              <Button 
+                variation="primary"
+                onClick={() => window.open(generateWhatsAppLink(product), '_blank')}
+              >
+                Solicitar postre
               </Button>
             </Flex>
           </Card>

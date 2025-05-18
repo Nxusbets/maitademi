@@ -21,11 +21,46 @@ This guide will help you deploy your Maitademi Project to Vercel.
      git commit -m "Initial commit"
      ```
    - Create a repository on GitHub/GitLab/Bitbucket
-   - Push your code to the repository:
+   - Add the remote repository URL (replace with your actual repository URL):
      ```
-     git remote add origin <your-repository-url>
+     git remote add origin https://github.com/yourusername/your-repo-name.git
+     ```
+   - Verify the remote was added correctly:
+     ```
+     git remote -v
+     ```
+   - Check your current branch name:
+     ```
+     git branch
+     ```
+   - Push your code to the repository using your current branch name:
+     ```
+     git push -u origin your-branch-name
+     ```
+     
+   - If you're using the "master" branch:
+     ```
+     git push -u origin master
+     ```
+   - Or if you want to use the "main" branch instead:
+     ```
+     git branch -M main
      git push -u origin main
      ```
+
+   - **Troubleshooting Git Push Issues:**
+     - If you see `fatal: 'origin' does not appear to be a git repository`, it means your remote isn't set up properly. Use:
+       ```
+       git remote add origin https://github.com/yourusername/your-repo-name.git
+       ```
+     - If you see `fatal: The current branch master has no upstream branch`, make sure to use the `-u` flag:
+       ```
+       git push -u origin master
+       ```
+     - To verify your remotes are correctly configured:
+       ```
+       git remote -v
+       ```
 
 3. **Deploy to Vercel**
    - Go to [Vercel Dashboard](https://vercel.com/dashboard)

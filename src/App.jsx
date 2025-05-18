@@ -11,6 +11,9 @@ import Footer from './components/Footer';
 import { theme } from './theme';
 import './App.css';
 import Testimonials from './components/Testimonials';
+import Faqs from './pages/Faqs';
+import PromotionsBanner from './components/PromotionsBanner';
+
 
 function App() {
   return (
@@ -21,7 +24,9 @@ function App() {
           <Routes>
             <Route path="/" element={<>
               <Home />
+              <PromotionsBanner />
               <Testimonials />
+              <Faqs />
             </>} />
             <Route path="/products" element={<Products />} />
             <Route path="/custom-cake" element={<CustomCake />} />
