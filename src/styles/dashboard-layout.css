@@ -1,0 +1,14 @@
+.admin-dashboard {
+  min-height: 100vh;
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+}
+
+.dashboard-header {
+  background: linear-gradient(135deg, #f1dff1 0%, #f1afe1 100%);
+  color: white;
+  padding: 15px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}

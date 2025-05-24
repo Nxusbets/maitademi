@@ -1,9 +1,12 @@
 .home {
-  width: 100%; /* Ensure the home container fits within the viewport */
+  width: 100%;
+  /* Ensure the home container fits within the viewport */
   min-height: 100vh;
-  background: #FFB6C1; /* Replace gradient with solid color */
+  background: #FFB6C1;
+  /* Replace gradient with solid color */
   color: #333;
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  overflow-x: hidden;
+  /* Prevent horizontal scrolling */
 }
 
 .hero {
@@ -13,23 +16,30 @@
   margin-bottom: 2rem;
 }
 
-.hero-section, 
-.features-section, 
-.gallery-section, 
+.hero-section,
+.features-section,
+.gallery-section,
 .cta-section {
-  max-width: 1200px; /* Limit the width of sections */
-  margin: 0 auto; /* Center sections horizontally */
-  padding: 4rem 2rem; /* Add padding for consistent spacing */
+  max-width: 1200px;
+  /* Limit the width of sections */
+  margin: 0 auto;
+  /* Center sections horizontally */
+  padding: 4rem 2rem;
+  /* Add padding for consistent spacing */
   text-align: center;
 }
 
 .hero-section {
-  width: 100%; /* Ensure the hero section fits within the viewport */
+  width: 100%;
+  /* Ensure the hero section fits within the viewport */
   text-align: center;
-  padding: 4rem 2rem; /* Add padding for better spacing */
-  background: #FFB6C1; /* Replace gradient with solid color */
+  padding: 4rem 2rem;
+  /* Add padding for better spacing */
+  background: #FFB6C1;
+  /* Replace gradient with solid color */
   color: #333;
-  margin: 0 auto 2rem; /* Center the section and remove negative margins */
+  margin: 0 auto 2rem;
+  /* Center the section and remove negative margins */
 }
 
 .hero-title {
@@ -47,23 +57,30 @@
 }
 
 .hero-button {
-  background-color: #DB7093; /* Match icon color */
-  color: #FFFFFF !important; /* Force text to be white */
+  background-color: #DB7093;
+  /* Match icon color */
+  color: #FFFFFF !important;
+  /* Force text to be white */
   padding: 1rem 2rem;
   border-radius: 25px;
   font-size: 1.2rem;
   transition: all 0.3s ease;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Add text shadow for better readability */
-  border: none; /* Ensure no border color conflicts */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  /* Add text shadow for better readability */
+  border: none;
+  /* Ensure no border color conflicts */
 }
 
 .hero-button a {
-  color: #FFFFFF !important; /* Ensure link text inside button is white */
-  text-decoration: none; /* Remove underline for links */
+  color: #FFFFFF !important;
+  /* Ensure link text inside button is white */
+  text-decoration: none;
+  /* Remove underline for links */
 }
 
 .hero-button:hover {
-  background-color: #C71585; /* Slightly darker pink on hover */
+  background-color: #C71585;
+  /* Slightly darker pink on hover */
 }
 
 .gallery-section {
@@ -82,12 +99,15 @@
   display: flex;
   gap: 1rem;
   justify-content: center;
-  flex-wrap: wrap; /* Allow wrapping for smaller screens */
+  flex-wrap: wrap;
+  /* Allow wrapping for smaller screens */
 }
 
 .gallery img {
-  width: 100%; /* Ensure images are responsive */
-  max-width: 300px; /* Limit the maximum width */
+  width: 100%;
+  /* Ensure images are responsive */
+  max-width: 300px;
+  /* Limit the maximum width */
   height: auto;
   object-fit: cover;
   border-radius: 15px;
@@ -95,7 +115,8 @@
 }
 
 .features-section {
-  background-color: rgba(255, 240, 245, 0.8); /* Slightly transparent background */
+  background-color: rgba(255, 240, 245, 0.8);
+  /* Slightly transparent background */
   border-radius: 15px;
   margin: 2rem auto;
   max-width: 1200px;
@@ -113,7 +134,8 @@
   display: flex;
   gap: 2rem;
   justify-content: center;
-  flex-wrap: wrap; /* Allow wrapping for smaller screens */
+  flex-wrap: wrap;
+  /* Allow wrapping for smaller screens */
 }
 
 .features {
@@ -193,8 +215,10 @@
 
 .jumbotron-container {
   min-height: 90vh;
-  background-color: #FFF5F7; /* Replace gradient with solid color */
-  background-image: none; /* Remove gradient and image */
+  background-color: #FFF5F7;
+  /* Replace gradient with solid color */
+  background-image: none;
+  /* Remove gradient and image */
   overflow: hidden;
 }
 
@@ -258,12 +282,13 @@
 }
 
 .cta-section {
-  background-color: #FFB6C1; /* Replace gradient with solid color */
+  background-color: #FFB6C1;
+  /* Replace gradient with solid color */
   border-radius: 15px;
   margin: 2rem auto;
   max-width: 1200px;
   text-align: center;
-  padding: 4rem 2rem;
+  padding: 1rem 1rem;
   color: white;
   border-radius: 15px;
 }
@@ -275,23 +300,43 @@
 }
 
 .cta-button {
-  background-color: #DB7093; /* Match icon color */
-  color: #FFFFFF !important; /* Force text to be white */
+  background-color: #DB7093;
+  /* Match icon color */
+  color: #FFFFFF !important;
+  /* Force text to be white */
   padding: 1rem 2rem;
   border-radius: 25px;
   font-size: 1.2rem;
   transition: all 0.3s ease;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Add text shadow for better readability */
-  border: none; /* Ensure no border color conflicts */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  /* Add text shadow for better readability */
+  border: none;
+  /* Ensure no border color conflicts */
 }
 
 .cta-button a {
-  color: #FFFFFF !important; /* Ensure link text inside button is white */
-  text-decoration: none; /* Remove underline for links */
+  color: #FFFFFF !important;
+  /* Ensure link text inside button is white */
+  text-decoration: none;
+  /* Remove underline for links */
 }
 
 .cta-button:hover {
-  background-color: #C71585; /* Slightly darker pink on hover */
+  background-color: #C71585;
+  /* Slightly darker pink on hover */
+}
+
+.hero-image {
+  margin: 1.5rem 0;
+  /* Espaciado entre el texto y el botón */
+  max-width: 100%;
+  /* Asegura que la imagen no exceda el ancho del contenedor */
+  height: auto;
+  /* Mantiene la proporción de la imagen */
+  border-radius: 12px;
+  /* Bordes redondeados para un diseño más elegante */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  /* Sombra para destacar la imagen */
 }
 
 @keyframes fadeInLeft {
@@ -299,6 +344,7 @@
     opacity: 0;
     transform: translateX(-30px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -309,6 +355,7 @@
   from {
     transform: scale(1.1);
   }
+
   to {
     transform: scale(1);
   }
@@ -329,47 +376,93 @@
   }
 
   .hero-title {
-    font-size: 2rem; /* Adjust font size for smaller screens */
+    font-size: 2rem;
+    /* Adjust font size for smaller screens */
   }
 
   .hero-subtitle {
-    font-size: 1.2rem; /* Adjust font size for smaller screens */
+    font-size: 1.2rem;
+    /* Adjust font size for smaller screens */
   }
 
   .hero-button {
-    font-size: 1rem; /* Adjust button size for smaller screens */
+    font-size: 1rem;
+    /* Adjust button size for smaller screens */
     padding: 0.8rem 1.5rem;
   }
 
   .hero-section {
-    padding: 2rem 1rem; /* Adjust padding for smaller screens */
+    padding: 2rem 1rem;
+    /* Adjust padding for smaller screens */
   }
 
   .features-container {
-    flex-direction: column; /* Stack features vertically */
+    flex-direction: column;
+    /* Stack features vertically */
     gap: 1.5rem;
   }
 
   .features-section,
-  .gallery-section,
+  .gallery-section {
+    margin: 1rem auto;
+    /* Reduce el margen superior e inferior */
+    max-width: 1000px;
+    /* Ajusta el ancho máximo si es necesario */
+    padding: 1rem 1rem;
+    /* Reduce el relleno */
+  }
+
   .cta-section {
-    padding: 2rem 1rem; /* Adjust padding for smaller screens */
+    padding: 2rem 1rem;
+    /* Adjust padding for smaller screens */
   }
 
   .feature-card {
-    padding: 1.5rem; /* Reduce padding for smaller screens */
+    padding: 1.5rem;
+    /* Reduce padding for smaller screens */
   }
 
   .gallery img {
-    max-width: 100%; /* Ensure images fit within the screen */
+    width: 100%;
+    max-width: 200px;
+    /* Reduce el tamaño máximo de las imágenes */
+    height: auto;
+    object-fit: cover;
+    border-radius: 10px;
+    /* Ajusta el radio de las esquinas si es necesario */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    /* Reduce la sombra */
+    margin-bottom: 0.5rem;
+  }
+
+  .gallery p,
+  .gallery h4 {
+    margin-top: 0.5rem;
+    /* Reduce el margen superior */
+  }
+
+  .gallery-text {
+    margin-top: 0.5rem;
+    /* Reduce el margen superior del texto */
+  }
+
+  .gallery {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    /* Reduce el espacio entre imágenes */
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .cta-title {
-    font-size: 1.5rem; /* Adjust font size for smaller screens */
+    font-size: 1.5rem;
+    /* Adjust font size for smaller screens */
   }
 
   .cta-button {
-    font-size: 1rem; /* Adjust button size for smaller screens */
+    font-size: 1rem;
+    /* Adjust button size for smaller screens */
     padding: 0.8rem 1.5rem;
   }
 }

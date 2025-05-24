@@ -1,43 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { Line, Bar, Doughnut, Radar, PolarArea } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-  RadialLinearScale
-} from 'chart.js';
 import { motion, AnimatePresence } from 'framer-motion';
-import './AdminDashboard.css';
+import KpiCard from '../components/KpiCard';
+import OrdersKanban from '../components/OrdersKanban';
+import CustomerCard from '../components/CustomerCard';
+import ChartContainer from '../components/ChartContainer';
 import ImageUploader from '../components/ImageUploader';
+import { useAuth } from '../contexts/AuthContext';
+import './dashboard-layout.css';
 
-// Registrar componentes de Chart.js
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-  RadialLinearScale
-);
 
 const AdminDashboard = () => {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuth(); // Obtén `user` y `logout` del contexto
+
   const [activeSection, setActiveSection] = useState('overview');
-  const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState('');
-  const [editingItem, setEditingItem] = useState(null);
   const [dateRange, setDateRange] = useState('month');
   const [notifications, setNotifications] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
@@ -408,108 +383,41 @@ const AdminDashboard = () => {
 
   // Componentes de renderizado
   const renderAdvancedOverview = () => (
-    <motion.div 
-      className="overview-section"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+    <div className="overview-section">
       {/* KPIs Principales */}
       <div className="kpi-grid">
-        <motion.div 
-          className="kpi-card sales"
-          whileHover={{ scale: 1.02 }}
-        >
-          <div className="kpi-header">
-            <div className="kpi-icon">💰</div>
-            <div className="kpi-trend positive">
-              ↗️ +{calculateGrowthRate().toFixed(1)}%
-            </div>
-          </div>
-          <div className="kpi-content">
-            <h3>Ventas {dateRange === 'month' ? 'del Mes' : dateRange === 'quarter' ? 'del Trimestre' : 'del Año'}</h3>
-            <p className="kpi-value">${calculateTotalSales(dateRange).toLocaleString()}</p>
-            <div className="kpi-progress">
-              <div className="progress-bar">
-                <div 
-                  className="progress-fill sales-progress"
-                  style={{ width: `${(calculateTotalSales(dateRange) / financialData.targets.monthly) * 100}%` }}
-                />
-              </div>
-              <small>Meta: ${financialData.targets.monthly.toLocaleString()}</small>
-            </div>
-          </div>
-        </motion.div>
-        
-        <motion.div 
-          className="kpi-card expenses"
-          whileHover={{ scale: 1.02 }}
-        >
-          <div className="kpi-header">
-            <div className="kpi-icon">💸</div>
-            <div className="kpi-trend negative">
-              ↗️ +12.3%
-            </div>
-          </div>
-          <div className="kpi-content">
-            <h3>Gastos del Mes</h3>
-            <p className="kpi-value">${calculateTotalExpenses().toLocaleString()}</p>
-            <div className="kpi-progress">
-              <div className="progress-bar">
-                <div 
-                  className="progress-fill expenses-progress"
-                  style={{ width: `${(calculateTotalExpenses() / (financialData.targets.monthly * 0.4)) * 100}%` }}
-                />
-              </div>
-              <small>{((calculateTotalExpenses() / calculateTotalSales()) * 100).toFixed(1)}% de las ventas</small>
-            </div>
-          </div>
-        </motion.div>
-        
-        <motion.div 
-          className="kpi-card profit"
-          whileHover={{ scale: 1.02 }}
-        >
-          <div className="kpi-header">
-            <div className="kpi-icon">📈</div>
-            <div className="kpi-trend positive">
-              ↗️ +28.5%
-            </div>
-          </div>
-          <div className="kpi-content">
-            <h3>Ganancia Neta</h3>
-            <p className="kpi-value">${calculateProfit().toLocaleString()}</p>
-            <div className="kpi-progress">
-              <div className="progress-bar">
-                <div 
-                  className="progress-fill profit-progress"
-                  style={{ width: `${((calculateProfit() / calculateTotalSales()) * 100)}%` }}
-                />
-              </div>
-              <small>Margen: {((calculateProfit() / calculateTotalSales()) * 100).toFixed(1)}%</small>
-            </div>
-          </div>
-        </motion.div>
-        
-        <motion.div 
-          className="kpi-card orders"
-          whileHover={{ scale: 1.02 }}
-        >
-          <div className="kpi-header">
-            <div className="kpi-icon">🎂</div>
-            <div className="kpi-trend positive">
-              ↗️ +15.2%
-            </div>
-          </div>
-          <div className="kpi-content">
-            <h3>Pedidos Activos</h3>
-            <p className="kpi-value">{orders.filter(order => order.status !== 'completado').length}</p>
-            <div className="kpi-metrics">
-              <span className="metric urgent">🔥 {orders.filter(order => order.priority === 'alta').length} Urgentes</span>
-              <span className="metric pending">⏳ {orders.filter(order => order.status === 'pendiente').length} Pendientes</span>
-            </div>
-          </div>
-        </motion.div>
+        <KpiCard
+          icon="💰"
+          trend={calculateGrowthRate()}
+          title="Ventas del Mes"
+          value={`$${calculateTotalSales(dateRange).toLocaleString()}`}
+          progress={(calculateTotalSales(dateRange) / financialData.targets.monthly) * 100}
+          color="#27ae60"
+        />
+        <KpiCard
+          icon="💸"
+          trend={-5.3}
+          title="Gastos del Mes"
+          value={`$${calculateTotalExpenses().toLocaleString()}`}
+          progress={(calculateTotalExpenses() / (financialData.targets.monthly * 0.4)) * 100}
+          color="#e74c3c"
+        />
+        <KpiCard
+          icon="📈"
+          trend={28.5}
+          title="Ganancia Neta"
+          value={`$${calculateProfit().toLocaleString()}`}
+          progress={((calculateProfit() / calculateTotalSales()) * 100)}
+          color="#2ed573"
+        />
+        <KpiCard
+          icon="🎂"
+          trend={15.2}
+          title="Pedidos Activos"
+          value={orders.filter(order => order.status !== 'completado').length}
+          progress={0}
+          color="#ffa502"
+        />
       </div>
 
       {/* Controles de Período */}
@@ -529,105 +437,80 @@ const AdminDashboard = () => {
 
       {/* Gráficos Avanzados */}
       <div className="advanced-charts-grid">
-        <motion.div 
-          className="chart-container main-chart"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <div className="chart-header">
-            <h3>📈 Tendencia Financiera 2024</h3>
-            <div className="chart-controls">
-              <button className="chart-btn active">Línea</button>
-              <button className="chart-btn">Área</button>
-              <button className="chart-btn">Barras</button>
-            </div>
-          </div>
-          <Line 
-            data={getAdvancedMonthlyData()} 
-            options={{
-              responsive: true,
-              interaction: {
-                mode: 'index',
-                intersect: false,
+        <ChartContainer 
+          title="📈 Tendencia Financiera 2024"
+          data={getAdvancedMonthlyData()}
+          type="line"
+          options={{
+            responsive: true,
+            interaction: {
+              mode: 'index',
+              intersect: false,
+            },
+            plugins: {
+              legend: {
+                position: 'top',
               },
-              plugins: {
-                legend: {
-                  position: 'top',
-                },
-                tooltip: {
-                  backgroundColor: 'rgba(0,0,0,0.8)',
-                  titleColor: '#fff',
-                  bodyColor: '#fff',
-                  borderColor: '#ff6b9d',
-                  borderWidth: 1,
-                }
-              },
-              scales: {
-                x: {
+              tooltip: {
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                titleColor: '#fff',
+                bodyColor: '#fff',
+                borderColor: '#ff6b9d',
+                borderWidth: 1,
+              }
+            },
+            scales: {
+              x: {
+                display: true,
+                title: {
                   display: true,
-                  title: {
-                    display: true,
-                    text: 'Meses'
-                  }
-                },
-                y: {
-                  display: true,
-                  title: {
-                    display: true,
-                    text: 'Cantidad ($MXN)'
-                  }
-                }
-              }
-            }} 
-          />
-        </motion.div>
-        
-        <motion.div 
-          className="chart-container performance-chart"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <h3>🎯 Análisis de Rendimiento</h3>
-          <Radar 
-            data={getPerformanceRadarData()}
-            options={{
-              responsive: true,
-              plugins: {
-                legend: {
-                  position: 'bottom',
+                  text: 'Meses'
                 }
               },
-              scales: {
-                r: {
-                  beginAtZero: true,
-                  max: 100
+              y: {
+                display: true,
+                title: {
+                  display: true,
+                  text: 'Cantidad ($MXN)'
                 }
               }
-            }}
-          />
-        </motion.div>
+            }
+          }}
+        />
         
-        <motion.div 
-          className="chart-container products-chart"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <h3>🏆 Productos Más Vendidos</h3>
-          <PolarArea 
-            data={getTopProductsData()}
-            options={{
-              responsive: true,
-              plugins: {
-                legend: {
-                  position: 'bottom',
-                }
+        <ChartContainer 
+          title="🎯 Análisis de Rendimiento"
+          data={getPerformanceRadarData()}
+          type="radar"
+          options={{
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'bottom',
               }
-            }}
-          />
-        </motion.div>
+            },
+            scales: {
+              r: {
+                beginAtZero: true,
+                max: 100
+              }
+            }
+          }}
+        />
+        
+        <ChartContainer 
+          title="🏆 Productos Más Vendidos"
+          data={getTopProductsData()}
+          type="polarArea"
+          options={{
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'bottom',
+              }
+            }
+          }}
+        />
       </div>
 
       {/* Métricas Rápidas */}
@@ -651,15 +534,11 @@ const AdminDashboard = () => {
           </span>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 
   const renderInventoryManagement = () => (
-    <motion.div 
-      className="section-content"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-    >
+    <div className="section-content">
       <div className="section-header">
         <h3>📦 Gestión de Inventario</h3>
         <button className="add-btn" onClick={() => openModal('inventory')}>
@@ -669,10 +548,9 @@ const AdminDashboard = () => {
       
       <div className="inventory-grid">
         {inventory.map(item => (
-          <motion.div 
+          <div 
             key={item.id} 
             className={`inventory-card ${item.stock <= item.minStock ? 'low-stock' : ''}`}
-            whileHover={{ scale: 1.02 }}
           >
             <div className="inventory-header">
               <h4>{item.name}</h4>
@@ -697,18 +575,14 @@ const AdminDashboard = () => {
               <button className="stock-btn">+ Stock</button>
               <button className="edit-btn">✏️</button>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 
   const renderOrdersManagement = () => (
-    <motion.div 
-      className="section-content"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-    >
+    <div className="section-content">
       <div className="section-header">
         <h3>📋 Gestión de Pedidos</h3>
         <button className="add-btn" onClick={() => openModal('order')}>
@@ -716,104 +590,15 @@ const AdminDashboard = () => {
         </button>
       </div>
       
-      <div className="orders-kanban">
-        <div className="kanban-column">
-          <h4>📝 Pendientes</h4>
-          {orders.filter(order => order.status === 'pendiente').map(order => (
-            <motion.div 
-              key={order.id} 
-              className={`order-card priority-${order.priority}`}
-              whileHover={{ scale: 1.02 }}
-              layout
-            >
-              <div className="order-header">
-                <span className="customer-name">{order.customer}</span>
-                <span className={`priority-badge ${order.priority}`}>
-                  {order.priority === 'alta' ? '🔥' : order.priority === 'media' ? '⚡' : '📝'}
-                </span>
-              </div>
-              <div className="order-content">
-                <h5>{order.product}</h5>
-                <p>{order.notes}</p>
-                <div className="order-meta">
-                  <span className="delivery-date">📅 {order.deliveryDate}</span>
-                  <span className="order-amount">${order.amount.toLocaleString()}</span>
-                </div>
-              </div>
-              <div className="order-actions">
-                <button onClick={() => updateOrderStatus(order.id, 'en_proceso')}>
-                  Iniciar
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-        
-        <div className="kanban-column">
-          <h4>⚙️ En Proceso</h4>
-          {orders.filter(order => order.status === 'en_proceso').map(order => (
-            <motion.div 
-              key={order.id} 
-              className={`order-card priority-${order.priority}`}
-              whileHover={{ scale: 1.02 }}
-              layout
-            >
-              <div className="order-header">
-                <span className="customer-name">{order.customer}</span>
-                <span className="progress-indicator">🔄</span>
-              </div>
-              <div className="order-content">
-                <h5>{order.product}</h5>
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: '60%' }} />
-                </div>
-                <div className="order-meta">
-                  <span className="delivery-date">📅 {order.deliveryDate}</span>
-                  <span className="order-amount">${order.amount.toLocaleString()}</span>
-                </div>
-              </div>
-              <div className="order-actions">
-                <button onClick={() => updateOrderStatus(order.id, 'completado')}>
-                  Completar
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-        
-        <div className="kanban-column">
-          <h4>✅ Completados</h4>
-          {orders.filter(order => order.status === 'completado').map(order => (
-            <motion.div 
-              key={order.id} 
-              className="order-card completed"
-              whileHover={{ scale: 1.02 }}
-              layout
-            >
-              <div className="order-header">
-                <span className="customer-name">{order.customer}</span>
-                <span className="completed-badge">✅</span>
-              </div>
-              <div className="order-content">
-                <h5>{order.product}</h5>
-                <div className="order-meta">
-                  <span className="delivery-date">📅 {order.deliveryDate}</span>
-                  <span className="order-amount">${order.amount.toLocaleString()}</span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </motion.div>
+      <OrdersKanban 
+        orders={orders}
+        onUpdateStatus={updateOrderStatus}
+      />
+    </div>
   );
 
   const renderCustomersManagement = () => (
-    <motion.div 
-      className="section-content"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-    >
+    <div className="section-content">
       <div className="section-header">
         <h3>👥 Gestión de Clientes</h3>
         <div className="header-actions">
@@ -828,48 +613,14 @@ const AdminDashboard = () => {
       
       <div className="customers-grid">
         {financialData.customers.map((customer, index) => (
-          <motion.div 
+          <CustomerCard 
             key={index} 
-            className="customer-card"
-            whileHover={{ scale: 1.02 }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <div className="customer-avatar">
-              <span>{customer.name.charAt(0)}</span>
-            </div>
-            <div className="customer-info">
-              <h4>{customer.name}</h4>
-              <div className="customer-stats">
-                <div className="stat">
-                  <span className="label">Total Gastado</span>
-                  <span className="value">${customer.totalSpent.toLocaleString()}</span>
-                </div>
-                <div className="stat">
-                  <span className="label">Pedidos</span>
-                  <span className="value">{customer.orders}</span>
-                </div>
-                <div className="stat">
-                  <span className="label">Último Pedido</span>
-                  <span className="value">{customer.lastOrder}</span>
-                </div>
-              </div>
-              <div className="customer-tier">
-                <span className={`tier-badge ${customer.totalSpent > 2000 ? 'gold' : customer.totalSpent > 1000 ? 'silver' : 'bronze'}`}>
-                  {customer.totalSpent > 2000 ? '🥇 VIP' : customer.totalSpent > 1000 ? '🥈 Premium' : '🥉 Regular'}
-                </span>
-              </div>
-            </div>
-            <div className="customer-actions">
-              <button className="contact-btn">📞</button>
-              <button className="email-btn">📧</button>
-              <button className="more-btn">⋯</button>
-            </div>
-          </motion.div>
+            customer={customer}
+            index={index}
+          />
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 
   const renderProductsSection = () => {
@@ -1077,7 +828,7 @@ const AdminDashboard = () => {
   const renderContent = () => {
     switch (activeSection) {
       case 'overview':
-        return renderOverviewSection();
+        return renderAdvancedOverview();
       case 'sales':
         return renderSalesSection();
       case 'expenses':
@@ -1089,7 +840,7 @@ const AdminDashboard = () => {
       case 'site-config':
         return renderSiteConfigSection();
       default:
-        return renderOverviewSection();
+        return renderAdvancedOverview();
     }
   };
 
@@ -1424,7 +1175,7 @@ const AdminDashboard = () => {
   };
 
   if (!user) {
-    return <div>Acceso denegado</div>;
+    return <div>Acceso denegado</div>; // Manejo de usuarios no autenticados
   }
 
   return (

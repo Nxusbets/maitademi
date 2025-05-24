@@ -194,12 +194,10 @@
 }
 
 .dashboard-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 40px 20px;
   display: grid;
   grid-template-columns: 280px 1fr;
   gap: 40px;
+  padding: 20px;
 }
 
 .dashboard-nav ul {
@@ -263,10 +261,11 @@
 .kpi-card {
   background: white;
   border-radius: 15px;
-  padding: 25px;
+  padding: 20px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.08);
   transition: transform 0.3s, box-shadow 0.3s;
   border-left: 5px solid;
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
 }
 
 .kpi-card:hover {
@@ -445,6 +444,8 @@
   border-radius: 15px;
   padding: 25px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  width: 100%;
+  height: auto;
 }
 
 .chart-container.main-chart {
@@ -975,6 +976,7 @@
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -1133,419 +1135,43 @@
 /* Tablets */
 @media (max-width: 1200px) {
   .dashboard-content {
-    grid-template-columns: 260px 1fr;
+    grid-template-columns: 1fr;
     gap: 30px;
-  }
-  
-  .advanced-charts-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-  
-  .chart-container.main-chart {
-    grid-column: span 2;
-  }
-  
-  .kpi-grid {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   }
 }
 
-/* Small Tablets / Large Phones */
-@media (max-width: 968px) {
+/* Móviles grandes */
+@media (max-width: 768px) {
   .dashboard-content {
     grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 20px 15px;
+    padding: 15px;
   }
-  
-  .header-content {
-    flex-direction: column;
-    gap: 15px;
-    text-align: center;
-    padding: 0 15px;
-  }
-  
-  .header-left h1 {
-    font-size: 20px;
-  }
-  
-  .header-right {
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .header-actions {
-    order: 2;
-  }
-  
-  .user-info {
-    order: 1;
-  }
-  
-  .user-details {
-    display: none;
-  }
-  
+
   .dashboard-nav ul {
     display: flex;
     overflow-x: auto;
-    border-radius: 10px;
-    padding: 5px;
-    background: white;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    gap: 10px;
   }
-  
-  .dashboard-nav li {
-    border-bottom: none;
-    border-right: 1px solid #f0f0f0;
-    min-width: 120px;
-    flex-shrink: 0;
-  }
-  
-  .dashboard-nav li:last-child {
-    border-right: none;
-  }
-  
-  .dashboard-nav button {
-    padding: 12px 15px;
-    font-size: 14px;
-    text-align: center;
-    white-space: nowrap;
-  }
-  
-  .dashboard-main {
-    padding: 25px 20px;
-  }
-  
+
   .kpi-grid {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
-  .advanced-charts-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .chart-container.main-chart {
-    grid-column: span 1;
-  }
-  
-  .orders-kanban {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .customers-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .inventory-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .quick-metrics {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-  }
-  
-  .period-controls {
-    flex-direction: column;
-    gap: 15px;
-    align-items: stretch;
-  }
-  
-  .section-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .header-actions {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .search-input {
-    width: 100%;
-  }
-  
-  .notifications-dropdown {
-    width: 90vw;
-    max-width: 320px;
-    right: -50px;
-  }
 }
 
-/* Mobile Phones */
+/* Móviles pequeños */
 @media (max-width: 480px) {
   .dashboard-header {
-    padding: 10px 0;
-  }
-  
-  .header-content {
-    padding: 0 10px;
-  }
-  
-  .header-left h1 {
-    font-size: 18px;
-  }
-  
-  .breadcrumb {
-    font-size: 12px;
-  }
-  
-  .header-actions {
-    gap: 10px;
-  }
-  
-  .theme-toggle,
-  .notifications-btn,
-  .logout-btn {
-    padding: 6px 10px;
-    font-size: 14px;
-  }
-  
-  .user-avatar {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
-  }
-  
-  .dashboard-content {
-    padding: 15px 10px;
-    gap: 15px;
-  }
-  
-  .dashboard-nav ul {
-    padding: 3px;
-  }
-  
-  .dashboard-nav button {
-    padding: 10px 12px;
-    font-size: 12px;
-    min-width: 100px;
-  }
-  
-  .dashboard-main {
-    padding: 20px 15px;
-  }
-  
-  .kpi-card {
-    padding: 20px 15px;
-  }
-  
-  .kpi-icon {
-    font-size: 1.5rem;
-  }
-  
-  .kpi-value {
-    font-size: 1.5rem;
-  }
-  
-  .kpi-content h3 {
-    font-size: 12px;
-  }
-  
-  .kpi-metrics {
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .chart-container {
-    padding: 15px;
-  }
-  
-  .chart-header {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .chart-controls {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .quick-metrics {
-    grid-template-columns: 1fr;
-    gap: 10px;
-    padding: 15px;
-  }
-  
-  .metric-value {
-    font-size: 1.2rem;
-  }
-  
-  .inventory-card {
-    padding: 15px;
-  }
-  
-  .inventory-actions {
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .kanban-column {
-    padding: 15px;
-  }
-  
-  .order-card {
-    padding: 12px;
-  }
-  
-  .order-meta {
-    flex-direction: column;
-    gap: 5px;
-  }
-  
-  .customer-card {
-    padding: 20px 15px;
-  }
-  
-  .customer-avatar {
-    width: 50px;
-    height: 50px;
-    font-size: 1.2rem;
-  }
-  
-  .customer-stats {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-  
-  .customer-stats .stat {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     padding: 10px;
-    background: #f8f9fa;
-    border-radius: 8px;
   }
-  
-  .customer-stats .label,
-  .customer-stats .value {
-    display: inline;
-  }
-  
-  .section-content h3 {
-    font-size: 20px;
-  }
-  
-  .add-btn {
-    padding: 10px 20px;
-    font-size: 14px;
-  }
-  
-  .save-btn {
-    padding: 12px 30px;
-    font-size: 14px;
-  }
-  
-  .control-group {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
-  
-  .control-group select {
-    width: 100%;
-  }
-  
-  .export-btn {
-    padding: 8px 16px;
-    font-size: 14px;
-  }
-  
-  .notifications-dropdown {
-    width: 95vw;
-    right: -80px;
-  }
-  
-  .notifications-header {
-    padding: 12px 15px;
-  }
-  
-  .notification-item {
-    padding: 12px 15px;
-  }
-  
-  .notification-content h5 {
-    font-size: 14px;
-    margin-bottom: 5px;
-  }
-  
-  .notification-content p {
-    font-size: 12px;
-  }
-}
 
-/* Extra Small Devices */
-@media (max-width: 320px) {
-  .dashboard-nav button {
-    min-width: 80px;
-    padding: 8px 10px;
-    font-size: 11px;
-  }
-  
-  .kpi-card {
-    padding: 15px 10px;
-  }
-  
-  .chart-container {
-    padding: 10px;
-  }
-  
-  .dashboard-main {
-    padding: 15px 10px;
-  }
-  
-  .quick-metrics {
-    padding: 10px;
-  }
-  
-  .customer-card,
-  .inventory-card,
-  .order-card {
-    padding: 15px 10px;
-  }
-}
-
-/* Landscape Mobile */
-@media (max-width: 896px) and (orientation: landscape) {
-  .dashboard-header {
-    padding: 8px 0;
-  }
-  
   .header-content {
-    flex-direction: row;
-    gap: 10px;
+    flex-direction: column;
+    text-align: center;
   }
-  
-  .header-right {
-    flex-direction: row;
-    gap: 10px;
-  }
-  
-  .user-details {
-    display: none;
-  }
-  
-  .dashboard-content {
+
+  .kpi-card {
     padding: 15px;
-  }
-  
-  .kpi-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .advanced-charts-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .orders-kanban {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
   }
 }
 

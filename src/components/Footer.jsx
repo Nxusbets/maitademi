@@ -18,7 +18,7 @@ const Footer = () => {
         <div className="footer-section">
           <h4>Contacto</h4>
           <div className="social-links">
-            <a href="tel:+1234567890" target="_blank" aria-label="Teléfono">
+            <a href="tel:3316921606" target="_blank" aria-label="Teléfono">
               <FaPhoneAlt />
             </a>
             <a href="mailto:info@maitademi.com" target="_blank" aria-label="Correo">
@@ -29,13 +29,13 @@ const Footer = () => {
         <div className="footer-section">
           <h4>Síguenos</h4>
           <div className="social-links">
-            <a href="#" target="_blank" aria-label="Instagram">
+            <a href="https://www.instagram.com/maitademi" target="_blank" aria-label="Instagram">
               <FaInstagram />
             </a>
-            <a href="#" target="_blank" aria-label="Facebook">
+            <a href="https://www.facebook.com/Maitademii" target="_blank" aria-label="Facebook">
               <FaFacebookF />
             </a>
-            <a href="#" target="_blank" aria-label="WhatsApp">
+            <a href="https://wa.me/3316921606" target="_blank" aria-label="WhatsApp">
               <FaWhatsapp />
             </a>
           </div>

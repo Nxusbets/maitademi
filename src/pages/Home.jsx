@@ -1,14 +1,15 @@
-import { 
-  View, 
-  Heading, 
-  Text, 
-  Button, 
-  Flex, 
-  useTheme 
+import {
+  View,
+  Heading,
+  Text,
+  Button,
+  Flex,
+  useTheme
 } from '@aws-amplify/ui-react';
 import { Link } from 'react-router-dom';
 import { FaStar, FaPalette, FaHandsHelping } from 'react-icons/fa';
 import './Home.css';
+import { motion } from 'framer-motion';
 
 const Home = () => {
   const { tokens } = useTheme();
@@ -27,8 +28,13 @@ const Home = () => {
             Bienvenido a Maitademi
           </Heading>
           <Text className="hero-subtitle">
-            Endulzamos tus momentos más especiales con pasteles y postres únicos.
+            Desde hace más de 10 años, Maitademi nació con la pasión de crear e inspirar a través de pasteles y postres únicos. Transformamos tus momentos especiales en recuerdos inolvidables, endulzando cada celebración con amor y creatividad.
           </Text>
+          <img
+            src="https://res.cloudinary.com/ddi0sl10o/image/upload/v1748116064/1000074679_bzgzil.jpg"
+            alt="Pastel decorado"
+            className="hero-image"
+          />
           <Button className="hero-button">
             <Link to="/custom-cake">Personaliza tu Pastel</Link>
           </Button>
@@ -66,14 +72,40 @@ const Home = () => {
 
         {/* Gallery Section */}
         <section className="gallery-section">
-          <Heading level={2} className="gallery-title">
+          <motion.h2
+            className="gallery-title"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
             Nuestras Creaciones
-          </Heading>
-          <div className="gallery">
-            <img src="https://res.cloudinary.com/ddi0sl10o/image/upload/v1748116064/1000074648_hfm3wl.jpg" alt="Pastel 1" />
-            <img src="https://res.cloudinary.com/ddi0sl10o/image/upload/v1748116064/1000074654_orzqu7.jpg" alt="Pastel 2" />
-            <img src="https://res.cloudinary.com/ddi0sl10o/image/upload/v1748116064/1000075448_hu6074.jpg" alt="Pastel 3" />
-          </div>
+          </motion.h2>
+          <motion.div
+            className="gallery"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
+            }}
+          >
+            {[
+              "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748116064/1000074648_hfm3wl.jpg",
+              "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748116064/1000074654_orzqu7.jpg",
+              "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748116064/1000075448_hu6074.jpg",
+            ].map((src, index) => (
+              <motion.img
+                key={index}
+                src={src}
+                alt={`Pastel ${index + 1}`}
+                className="gallery-image"
+                whileHover={{ scale: 1.1, boxShadow: "0px 8px 20px rgba(0, 0, 0, 0.2)" }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.2 }}
+              />
+            ))}
+          </motion.div>
         </section>
 
         {/* Call to Action */}

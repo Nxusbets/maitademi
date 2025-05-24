@@ -1,0 +1,63 @@
+.kpi-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s;
+  border-left: 5px solid #27ae60;
+}
+
+.kpi-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.kpi-icon {
+  font-size: 24px;
+  color: #27ae60;
+}
+
+.kpi-trend {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.kpi-trend.positive {
+  color: #27ae60;
+}
+
+.kpi-trend.negative {
+  color: #e74c3c;
+}
+
+.kpi-content h3 {
+  font-size: 18px;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.kpi-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #34495e;
+}
+
+.kpi-progress .progress-bar {
+  background: #ecf0f1;
+  border-radius: 8px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.kpi-progress .progress-fill {
+  background: #27ae60;
+  height: 100%;
+  transition: width 0.3s;
+}
