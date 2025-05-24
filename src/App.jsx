@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import Navbar from './components/Navbar';
@@ -13,31 +13,50 @@ import './App.css';
 import Testimonials from './components/Testimonials';
 import Faqs from './pages/faqs';
 import PromotionsBanner from './components/PromotionsBanner';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import AdminDashboard from './pages/AdminDashboard';
 
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) return <div>Cargando...</div>;
+  
+  return isAuthenticated ? children : <Navigate to="/" />;
+};
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <Router>
-        <div className="App">
-          <Navbar />
-          <Routes>
-            <Route path="/" element={
-              <>
-                <Home />
-                <PromotionsBanner />
-                <Testimonials />
-                <Faqs />
-              </>
-            } />
-            <Route path="/products" element={<Products />} />
-            <Route path="/custom-cake" element={<CustomCake />} />
-            <Route path="/contact" element={<Contact />} />
-          </Routes>
-          <Footer />
-        </div>
-      </Router>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider theme={theme}>
+        <Router>
+          <div className="App">
+            <Navbar />
+            <Routes>
+              <Route path="/" element={
+                <>
+                  <Home />
+                  <PromotionsBanner />
+                  <Testimonials />
+                  <Faqs />
+                </>
+              } />
+              <Route path="/products" element={<Products />} />
+              <Route path="/custom-cake" element={<CustomCake />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route 
+                path="/admin/dashboard" 
+                element={
+                  <ProtectedRoute>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+            </Routes>
+            <Footer />
+          </div>
+        </Router>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 

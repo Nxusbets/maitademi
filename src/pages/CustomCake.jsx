@@ -6,13 +6,12 @@ import './CustomCake.css';
 const CustomCake = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    size: 'medium',
+    servings: '',
     flavor: 'vanilla',
     filling: '',
     toppings: [],
     decorationType: '',
     occasion: '',
-    servings: '',
     date: '',
     specialInstructions: '',
     name: '',
@@ -50,6 +49,40 @@ const CustomCake = () => {
     }
   };
 
+  // Función para obtener el nombre legible del sabor
+  const getFlavorName = (flavor) => {
+    const flavors = {
+      vanilla: 'Vainilla',
+      vanillaNut: 'Vainilla con Nuez',
+      orange: 'Naranja',
+      chocolate: 'Chocolate',
+      marble: 'Marmoleado (Mantequilla/Chocolate)',
+      carrot: 'Zanahoria',
+      redVelvet: 'Red Velvet',
+      tresLechesVanilla: 'Tres Leches (Vainilla)',
+      tresLechesChocolate: 'Tres Leches (Chocolate)',
+      tresLechesMoka: 'Tres Leches (Moka)'
+    };
+    return flavors[flavor] || flavor;
+  };
+
+  // Función para obtener el nombre legible del relleno
+  const getFillingName = (filling) => {
+    const fillings = {
+      mermelada: 'Mermeladas',
+      cremaBatida: 'Crema Batida',
+      cremaPastelera: 'Crema Pastelera',
+      cajetaNuez: 'Cajeta con Nuez',
+      cremaAvellanas: 'Crema de Avellanas',
+      fresasCrema: 'Fresas con Crema',
+      duraznosCrema: 'Duraznos con Crema',
+      ganacheChocolate: 'Ganache de Chocolate',
+      flanNapolitano: 'Flan Napolitano',
+      cremaQueso: 'Crema de Queso'
+    };
+    return fillings[filling] || filling;
+  };
+
   // Número de WhatsApp de la pastelería (reemplazar con el número real)
   const phoneNumber = '523326827809';
 
@@ -59,9 +92,9 @@ const CustomCake = () => {
     const message = `
 ¡Hola! Me gustaría cotizar un pastel con las siguientes características:
 
-🎂 Tamaño: ${formData.size}
-🍰 Sabor: ${formData.flavor}
-🍫 Relleno: ${formData.filling}
+🎂 Porciones: ${formData.servings}
+🍰 Sabor: ${getFlavorName(formData.flavor)}
+🍫 Relleno: ${getFillingName(formData.filling)}
 🎉 Ocasión: ${formData.occasion}
 📅 Fecha de entrega: ${formData.date}
 📝 Instrucciones especiales: ${formData.specialInstructions}
@@ -90,38 +123,43 @@ ${formData.budget ? `- Presupuesto aproximado: $${formData.budget} MXN` : ''}
       <h1>Personaliza tu Pastel Soñado</h1>
       <p className="subtitle">Cuéntanos todos los detalles para crear tu pastel perfecto</p>
 
-  
-
       <form onSubmit={handleSubmit} className="custom-cake-form">
         <div className="form-section">
           <h3>Detalles del Pastel</h3>
           
           <div className="form-group">
-            <label>Tamaño del Pastel (Porciones)</label>
-            <select name="size" value={formData.size} onChange={handleChange}>
-              <option value="small">Pequeño (8-10 porciones)</option>
-              <option value="medium">Mediano (11-15 porciones)</option>
-              <option value="large">Grande (16-20 porciones)</option>
-              <option value="xl">Extra Grande (21-25 porciones)</option>
-              <option value="jumbo">Jumbo (26-30 porciones)</option>
-              <option value="custom">Más de 30 porciones (cotización especial)</option>
+            <label>Número de Porciones</label>
+            <select name="servings" value={formData.servings} onChange={handleChange} required>
+              <option value="">Selecciona las porciones</option>
+              <option value="8-10">8 a 10 porciones</option>
+              <option value="11-15">11 a 15 porciones</option>
+              <option value="16-20">16 a 20 porciones</option>
+              <option value="21-25">21 a 25 porciones</option>
+              <option value="26-30">26 a 30 porciones</option>
+              <option value="30+">Más de 30 porciones (cotización especial)</option>
             </select>
           </div>
 
           <div className="form-group">
             <label>Sabor del Pastel</label>
             <select name="flavor" value={formData.flavor} onChange={handleChange}>
-              <option value="vanilla">Vainilla con Nuez</option>
-              <option value="marble">Marmoleado (Mantequilla-Chocolate)</option>
+              <option value="vanilla">Vainilla</option>
+              <option value="vanillaNut">Vainilla con Nuez</option>
+              <option value="orange">Naranja</option>
+              <option value="chocolate">Chocolate</option>
+              <option value="marble">Marmoleado (Mantequilla/Chocolate)</option>
+              <option value="carrot">Zanahoria</option>
+              <option value="redVelvet">Red Velvet</option>
               <option value="tresLechesVanilla">Tres Leches (Vainilla)</option>
               <option value="tresLechesChocolate">Tres Leches (Chocolate)</option>
-              <option value="tresLechesMocca">Tres Leches (Mocca)</option>
+              <option value="tresLechesMoka">Tres Leches (Moka)</option>
             </select>
           </div>
 
           <div className="form-group">
             <label>Relleno</label>
             <select name="filling" value={formData.filling} onChange={handleChange}>
+              <option value="">Selecciona un relleno</option>
               <optgroup label="Básico">
                 <option value="mermelada">Mermeladas</option>
                 <option value="cremaBatida">Crema Batida</option>

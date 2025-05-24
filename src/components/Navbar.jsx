@@ -8,6 +8,13 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
+  const navLinks = [
+    { path: '/', label: 'Inicio', icon: '🏠' },
+    { path: '/products', label: 'Pasteles', icon: '🎂' },
+    { path: '/custom-cake', label: 'Personalizar', icon: '✨' },
+    { path: '/contact', label: 'Contacto', icon: '📞' }
+  ];
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -36,12 +43,7 @@ const Navbar = () => {
           </Link>
 
           <div className="nav-links-desktop">
-            {[
-              { path: '/', label: 'Inicio', icon: '🏠' },
-              { path: '/products', label: 'Pasteles', icon: '🎂' },
-              { path: '/custom-cake', label: 'Personalizar', icon: '✨' },
-              { path: '/contact', label: 'Contacto', icon: '📞' }
-            ].map(({ path, label, icon }) => (
+            {navLinks.map(({ path, label, icon }) => (
               <motion.div
                 key={path}
                 className="nav-link-wrapper"
@@ -110,12 +112,7 @@ const Navbar = () => {
           >
             <h2 id="mobile-menu-title" className="sr-only">Menú de navegación móvil</h2>
             <div className="mobile-menu-content">
-              {[
-                { path: '/', label: 'Inicio', icon: '🏠' },
-                { path: '/products', label: 'Pasteles', icon: '🎂' },
-                { path: '/custom-cake', label: 'Personalizar', icon: '✨' },
-                { path: '/contact', label: 'Contacto', icon: '📞' }
-              ].map(({ path, label, icon }) => (
+              {navLinks.map(({ path, label, icon }) => (
                 <motion.div
                   key={path}
                   whileHover={{ x: 10, scale: 1.05 }}

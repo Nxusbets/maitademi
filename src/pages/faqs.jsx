@@ -10,7 +10,7 @@ function Faqs() {
   const faqItems = [
     {
       question: "¿Con cuánta anticipación debo hacer mi pedido?",
-      answer: "Recomendamos hacer tu pedido con al menos 3-5 días de anticipación para pasteles estándar, y 7-10 días para diseños personalizados complejos."
+      answer: "Recomendamos hacer tu pedido con 7 días de anticipación para pasteles con decoración en crema o impresión, y 15 días para decoración en fondant."
     },
     {
       question: "¿Hacen entregas a domicilio?",
@@ -22,11 +22,19 @@ function Faqs() {
     },
     {
       question: "¿Tienen opciones para personas con alergias o restricciones alimenticias?",
-      answer: "Sí, podemos adaptar nuestras recetas para necesidades específicas como libre de gluten o lácteos. Consulta por opciones disponibles."
+      answer: "Sí, tenemos opciones para personas alérgicas y diabéticas. Ofrecemos pasteles de zanahoria, cheesecake, galletas y podemos adaptar nuestras recetas para necesidades específicas como libre de gluten o lácteos. Consulta por opciones disponibles."
     },
     {
       question: "¿Puedo llevar mi propio diseño o referencia?",
       answer: "¡Claro! Puedes enviarnos referencias o ideas de diseño por WhatsApp y haremos lo posible por replicarlo."
+    },
+    {
+      question: "¿Qué productos ofrecen para personas diabéticas?",
+      answer: "Contamos con opciones especiales para personas diabéticas incluyendo pasteles de zanahoria, cheesecake y galletas preparados con endulzantes naturales. Consulta disponibilidad al hacer tu pedido."
+    },
+    {
+      question: "¿Qué diferencia hay entre decoración en crema y fondant?",
+      answer: "La decoración en crema permite diseños más naturales y sabores frescos, mientras que el fondant permite formas más precisas y colores vibrantes. El fondant requiere más tiempo de preparación (15 días vs 7 días para crema)."
     }
   ];
   

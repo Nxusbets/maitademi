@@ -70,9 +70,9 @@ const Home = () => {
             Nuestras Creaciones
           </Heading>
           <div className="gallery">
-            <img src="/images/cake1.jpg" alt="Pastel 1" />
-            <img src="/images/cake2.jpg" alt="Pastel 2" />
-            <img src="/images/cake3.jpg" alt="Pastel 3" />
+            <img src="https://res.cloudinary.com/ddi0sl10o/image/upload/v1748116064/1000074648_hfm3wl.jpg" alt="Pastel 1" />
+            <img src="https://res.cloudinary.com/ddi0sl10o/image/upload/v1748116064/1000074654_orzqu7.jpg" alt="Pastel 2" />
+            <img src="https://res.cloudinary.com/ddi0sl10o/image/upload/v1748116064/1000075448_hu6074.jpg" alt="Pastel 3" />
           </div>
         </section>
 

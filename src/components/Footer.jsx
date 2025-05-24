@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Footer.css';
 import { FaInstagram, FaFacebookF, FaWhatsapp, FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
+import AdminLogin from './AdminLogin';
+import { useAuth } from '../contexts/AuthContext';
 
 const Footer = () => {
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const { isAuthenticated, user, logout } = useAuth();
+
   return (
     <footer className="footer">
       <div className="footer-content">
@@ -37,8 +42,32 @@ const Footer = () => {
         </div>
       </div>
       <div className="footer-bottom">
-        <p>© 2025 Maitademi - Desarrollado con 💖 por <a href="https://github.com/nxusbets" target="_blank">NxuS</a></p>
+        <div className="footer-bottom-content">
+          <p>&copy; 2024 Maitademi. Todos los derechos reservados.</p>
+          
+          <div className="admin-access">
+            {isAuthenticated ? (
+              <div className="admin-logged">
+                <span className="admin-status">Admin: {user?.username}</span>
+                <a href="/admin/dashboard" className="dashboard-link">Dashboard</a>
+                <button onClick={logout} className="admin-logout">Salir</button>
+              </div>
+            ) : (
+              <button 
+                className="admin-access-btn"
+                onClick={() => setShowAdminLogin(true)}
+                title="Acceso administrativo"
+              >
+                Admin
+              </button>
+            )}
+          </div>
+        </div>
       </div>
+
+      {showAdminLogin && (
+        <AdminLogin onClose={() => setShowAdminLogin(false)} />
+      )}
     </footer>
   );
 };
