@@ -84,8 +84,8 @@ function PromotionsBanner() {
               variation="primary" 
               className="promo-button"
               onClick={() => handlePromoClick(promo.code)}
-              startIcon={<FaWhatsapp />}
             >
+              <FaWhatsapp style={{ marginRight: '8px' }} />
               {promo.buttonText}
             </Button>
           </Flex>

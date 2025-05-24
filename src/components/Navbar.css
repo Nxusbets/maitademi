@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   z-index: 1000;
-  height: 60px; /* Reduce height */
+  height: 75px; /* Reduce height */
   padding: 0.5rem 1rem; /* Reduce padding */
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);

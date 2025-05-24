@@ -20,8 +20,15 @@ export const AuthProvider = ({ children }) => {
     const userData = localStorage.getItem('adminUser');
     
     if (token && userData) {
-      setUser(JSON.parse(userData));
-      setIsAuthenticated(true);
+      try {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminUser');
+      }
     }
     setLoading(false);
   }, []);
