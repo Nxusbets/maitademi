@@ -9,7 +9,7 @@
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background-color: #FFF0F5;
+  background-color: #fafafa;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   font-family: var(--font-family-primary); /* Match Home page font */
   color: #DB7093; /* Match icon color */
@@ -36,6 +36,9 @@
   gap: 0.5rem;
   margin-right: auto; /* Push logo to the left */
   padding-left: 0; /* Remove extra padding */
+  min-width: 70px; /* Asegura espacio para el logo */
+  padding-left: 0.5rem;
+  padding-right: 1rem;
 }
 
 .logo-wrapper {
@@ -207,6 +210,16 @@
   font-family: 'Arial Narrow Black', sans-serif;
   background: rgba(219, 112, 147, 0.1);
   color: var(--dark-pink);
+}
+
+.navbar-logo {
+  height: 56px;
+  width: auto;
+  border-radius: 12px;
+  display: block;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  object-fit: contain;
 }
 
 @media (max-width: 968px) {

@@ -37,8 +37,12 @@ const Navbar = () => {
               className="logo-wrapper"
               whileHover={{ scale: 1.05 }}
             >
-              <span className="logo-text">Maitademi</span>
-              <span className="logo-subtitle">Pasteles Artesanales</span>
+              <img
+                src="https://res.cloudinary.com/ddi0sl10o/image/upload/v1748210121/Gemini_Generated_Image_y4i2any4i2any4i2_aeyc9u.png"
+                alt="Maitademi Logo"
+                className="navbar-logo"
+                style={{ height: "65px", width: "auto", borderRadius: "8px" }}
+              />
             </motion.div>
           </Link>
 
