@@ -10,35 +10,18 @@ import { Link } from 'react-router-dom';
 import { FaStar, FaPalette, FaHandsHelping } from 'react-icons/fa';
 import './Home.css';
 import { motion } from 'framer-motion';
+import React from 'react';
+import Welcome from '../components/Welcome';
 
 const Home = () => {
   const { tokens } = useTheme();
 
   return (
     <div className="home">
+      <Welcome />
       <View>
         {/* Hero Section */}
-        <Flex
-          direction="column"
-          alignItems="center"
-          justifyContent="center"
-          className="hero-section"
-        >
-          <Heading level={1} className="hero-title">
-            Bienvenido a Maitademi
-          </Heading>
-          <Text className="hero-subtitle">
-            Desde hace más de 10 años, Maitademi nació con la pasión de crear e inspirar a través de pasteles y postres únicos. Transformamos tus momentos especiales en recuerdos inolvidables, endulzando cada celebración con amor y creatividad.
-          </Text>
-          <img
-            src="https://res.cloudinary.com/ddi0sl10o/image/upload/v1748116064/1000074679_bzgzil.jpg"
-            alt="Pastel decorado"
-            className="hero-image"
-          />
-          <Button className="hero-button">
-            <Link to="/custom-cake">Personaliza tu Pastel</Link>
-          </Button>
-        </Flex>
+    
 
         {/* Features Section */}
         <section className="features-section">

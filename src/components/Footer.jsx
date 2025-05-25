@@ -3,6 +3,7 @@ import './Footer.css';
 import { FaInstagram, FaFacebookF, FaWhatsapp, FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
 import AdminLogin from './AdminLogin';
 import { useAuth } from '../contexts/AuthContext';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
@@ -14,6 +15,7 @@ const Footer = () => {
         <div className="footer-section">
           <h4>Maitademi</h4>
           <p>Endulzando tus momentos especiales</p>
+          <Link to="/aviso-privacidad" className="privacy-link">Aviso de Privacidad</Link>
         </div>
         <div className="footer-section">
           <h4>Contacto</h4>
@@ -43,7 +45,8 @@ const Footer = () => {
       </div>
       <div className="footer-bottom">
         <div className="footer-bottom-content">
-          <p>&copy; 2024 Maitademi. Todos los derechos reservados.</p>
+          <p>&copy; 2025 Maitademi. Todos los derechos reservados. Creado por <a href="https://portfolio1-beta-livid.vercel.app/" target="_blank" rel="noopener noreferrer">NxuS</a>.
+           Tu proyecto puede ser realidad con él.</p>
           
           <div className="admin-access">
             {isAuthenticated ? (

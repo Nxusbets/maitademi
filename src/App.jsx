@@ -15,6 +15,7 @@ import Faqs from './pages/faqs';
 import PromotionsBanner from './components/PromotionsBanner';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AdminDashboard from './pages/AdminDashboard';
+import AvisoPrivacidad from './components/AvisoPrivacidad';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -43,6 +44,7 @@ function App() {
               <Route path="/products" element={<Products />} />
               <Route path="/custom-cake" element={<CustomCake />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/aviso-privacidad" element={<AvisoPrivacidad />} />
               <Route 
                 path="/admin/dashboard" 
                 element={
@@ -51,6 +53,7 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
+              
             </Routes>
             <Footer />
           </div>

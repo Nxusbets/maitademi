@@ -53,3 +53,24 @@
   text-decoration: none;
   font-weight: bold;
 }
+
+/* Al final del archivo, añade estos estilos */
+
+.privacy-link {
+  display: block;
+  margin-top: 12px;
+  padding: 6px 10px;
+  background-color: rgba(219, 112, 147, 0.1);
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  color: var(--dark-pink, #DB7093);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.privacy-link:hover {
+  background-color: rgba(219, 112, 147, 0.2);
+  color: #C71585;
+  transform: translateY(-2px);
+}
