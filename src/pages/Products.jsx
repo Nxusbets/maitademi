@@ -1,3 +1,4 @@
+import './Products.css'; // Asegúrate de crear este archivo CSS
 import { 
   Collection,
   Card,
@@ -13,55 +14,64 @@ const Products = () => {
   const products = [
     {
       id: 1,
-      name: "Pastel de Chocolate Premium",
-      description: "Delicioso pastel de chocolate con ganache y decoración artesanal",
-      price: 450,
-      image: "https://1.bp.blogspot.com/-kM3FiRKJYzc/XxdM4_-MdVI/AAAAAAAAT4o/9EKOIQ43-zwMYY4HNXpqKBuy-oSLHZGYwCPcBGAYYCw/s1600/Pasteles-de-chocolate.jpg",
-      badge: "Más Vendido"
+      name: 'Pastel de Chocolate',
+      price: 225,
+      description: 'Relleno de ganache de chocolate, cobertura en crema de chocolate (8 porciones)',
+      image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748207926/1000075607_bhalw8.jpg",
     },
     {
       id: 2,
-      name: 'Cheesecake',
-      price: 300,
-      description: 'Cheesecake tradicional con mermelada de frutos rojos',
-      image: "https://www.comidaereceitas.com.br/wp-content/uploads/2008/04/Cheesecake-freepik.jpg",
-      badge: "Opción Diabética"
+      name: 'Panqué de Vainilla o Naranja con Nuez',
+      price: 120,
+      description: 'Panqué de 8 porciones con sabor a vainilla o naranja, acompañado de nuez.',
+      image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748207926/1000075619_dpios8.jpg",
     },
     {
       id: 3,
-      name: 'Cupcakes',
-      price: 180,
-      description: 'Pack de 6 cupcakes variados',
-      image: "https://bakemetreats.com/wp-content/uploads/2022/12/Cupcakes-1-copy-2.jpg"
+      name: 'Panqué de Queso Crema',
+      price: 190,
+      description: 'Decorado con crema de queso y canela (8 porciones).',
+      image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748207927/1000075613_lego7g.jpg",
     },
     {
       id: 4,
-      name: 'Pastel de Zanahoria',
-      price: 380,
-      description: 'Pastel húmedo de zanahoria con especias y cobertura de queso crema',
-      image: "https://www.recetasnestle.com.mx/sites/default/files/styles/recipe_detail_desktop/public/srh_recipes/4e4293857c03d819e4ae51de1e86d66a.jpg",
-      badge: "Saludable"
+      name: 'Flan Napolitano',
+      price: 280,
+      description: 'Flan clásico napolitano (8 porciones).',
+      image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748207926/1000075616_tnwkxo.jpg",
     },
     {
       id: 5,
-      name: 'Galletas Artesanales',
-      price: 120,
-      description: 'Galletas decoradas para cualquier ocasión especial',
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8fVqY4h0o4i4FWFYz3VHj_4zx9CeULn8n_w&s",
-      badge: "Opción Diabética"
+      name: 'Cheesecake',
+      price: 360,
+      description: '8-10 porciones decorado con chocolate y nuez.',
+      image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748207926/1000075619_dpios8.jpg",
     },
     {
       id: 6,
-      name: 'Red Velvet',
+      name: 'Pastel Red Velvet',
       price: 420,
-      description: 'Clásico pastel Red Velvet con crema de queso',
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFn8T0oD4DUKtCBH4rGzCPFT-bJYSbqZp1Bg&s"
+      description: 'Pastel en capas relleno de crema de queso, decoración en líneas de chocolate oscuro y cerezas (8 porciones).',
+      image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748208179/1000075622_hqlryf.jpg",
+    },
+    {
+      id: 7,
+      name: 'Pastel de Zanahoria',
+      price: 380,
+      description: 'Bizcocho con nuez, pasitas, zanahoria y canela. Relleno y cobertura en crema de queso (8 porciones).',
+      image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748207926/1000075625_dlqevp.jpg",
+    },
+    {
+      id: 8,
+      name: 'Gelatinas Individuales (Varios Sabores)',
+      price: 25,
+      description: 'Sabores: mosaico, yogurt, rompope, tres leches con fruta encapsulada.',
+      image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748207926/1000075628_goy6un.jpg",
     }
   ];
 
-  // Función para generar el enlace de WhatsApp con el pedido
   const generateWhatsAppLink = (product) => {
-    const phoneNumber = "523326827809"; // Reemplaza con tu número de WhatsApp configurado
+    const phoneNumber = "523326827809";
     const message = `Hola, me gustaría solicitar: ${product.name} - $${product.price} MXN`;
     return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
   };
@@ -82,13 +92,12 @@ const Products = () => {
         templateColumns="repeat(auto-fit, minmax(300px, 1fr))"
       >
         {(product) => (
-          <Card key={product.id} variation="elevated">
-            <div style={{ position: 'relative' }}>
+          <Card key={product.id} variation="elevated" className="product-card">
+            <div className="image-container">
               <Image
                 src={product.image}
                 alt={product.name}
-                objectFit="cover"
-                height="200px"
+                className="product-image"
               />
               {product.badge && (
                 <Badge
