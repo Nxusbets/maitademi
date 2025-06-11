@@ -42,9 +42,9 @@ const AvisoPrivacidad = () => {
           <p>
             Para cualquier pregunta relacionada con este Aviso de Privacidad, puede contactarnos a través de:
             <br />
-            Correo electrónico: privacidad@maitademi.com
+            
             <br />
-            Teléfono: (123) 456-7890
+            Teléfono: 3316921606
           </p>
         </div>
       </div>

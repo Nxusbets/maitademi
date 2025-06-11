@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { leadService } from '../services/firebaseService'; // Agregar esta importación
 import './CustomCake.css';
 
 const CustomCake = () => {
@@ -21,6 +22,7 @@ const CustomCake = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false); // Agregar estado de carga
 
   const validateField = (name, value) => {
     let error = '';
@@ -83,33 +85,104 @@ const CustomCake = () => {
     return fillings[filling] || filling;
   };
 
-  // Número de WhatsApp de la pastelería (reemplazar con el número real)
+  // Número de WhatsApp de la pastelería
   const phoneNumber = '523326827809';
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const message = `
-¡Hola! Me gustaría cotizar un pastel con las siguientes características:
+    if (isSubmitting) return; // Prevenir doble envío
+    setIsSubmitting(true);
 
-🎂 Porciones: ${formData.servings}
-🍰 Sabor: ${getFlavorName(formData.flavor)}
-🍫 Relleno: ${getFillingName(formData.filling)}
-🎉 Ocasión: ${formData.occasion}
-📅 Fecha de entrega: ${formData.date}
-📝 Instrucciones especiales: ${formData.specialInstructions}
+    try {
+      // Preparar datos para Firebase
+      const leadData = {
+        // Información del cliente
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        
+        // Información del evento/ocasión
+        eventType: formData.occasion || 'Pastel personalizado',
+        eventDate: formData.date,
+        
+        // Detalles del pastel
+        cakeDetails: {
+          servings: formData.servings,
+          flavor: getFlavorName(formData.flavor),
+          filling: getFillingName(formData.filling),
+          toppings: formData.toppings,
+          decorationType: formData.decorationType,
+          specialInstructions: formData.specialInstructions
+        },
+        
+        // Información adicional
+        budget: formData.budget,
+        message: `Solicitud de pastel personalizado:
+        - Porciones: ${formData.servings}
+        - Sabor: ${getFlavorName(formData.flavor)}
+        - Relleno: ${getFillingName(formData.filling)}
+        - Ocasión: ${formData.occasion}
+        - Fecha: ${formData.date}
+        - Instrucciones: ${formData.specialInstructions}
+        ${formData.budget ? `- Presupuesto: $${formData.budget} MXN` : ''}`,
+        
+        // Metadatos
+        status: 'new',
+        source: 'website_custom_cake',
+        type: 'custom_cake_quote',
+        createdAt: new Date()
+      };
 
-👤 Datos de contacto:
-- Nombre: ${formData.name}
-- Email: ${formData.email}
-- Teléfono: ${formData.phone}
-${formData.budget ? `- Presupuesto aproximado: $${formData.budget} MXN` : ''}
-    `.trim();
+      // Guardar en Firebase
+      const result = await leadService.create(leadData);
+      
+      if (result.success) {
+        console.log('Lead guardado exitosamente:', result.id);
+        
+        // Preparar mensaje para WhatsApp
+        const whatsappMessage = `
+¡Hola! Me gustaría cotizar un pastel personalizado con las siguientes características:
 
-    if (window.confirm('¿Deseas enviar esta cotización por WhatsApp?')) {
-      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappUrl, '_blank');
-      navigate('/'); // Redirige a la página de inicio
+🎂 *Detalles del Pastel:*
+• Porciones: ${formData.servings}
+• Sabor: ${getFlavorName(formData.flavor)}
+• Relleno: ${getFillingName(formData.filling)}
+• Ocasión: ${formData.occasion}
+• Fecha de entrega: ${formData.date}
+• Instrucciones especiales: ${formData.specialInstructions}
+
+👤 *Información de contacto:*
+• Nombre: ${formData.name}
+• Email: ${formData.email}
+• Teléfono: ${formData.phone}
+${formData.budget ? `• Presupuesto aproximado: $${formData.budget} MXN` : ''}
+
+*Referencia:* Lead #${result.id}
+        `.trim();
+
+        // Mostrar confirmación y enviar a WhatsApp
+        if (window.confirm('¡Tu solicitud ha sido registrada! ¿Deseas continuar con WhatsApp para recibir una respuesta más rápida?')) {
+          const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+          window.open(whatsappUrl, '_blank');
+        }
+        
+        // Mostrar mensaje de éxito
+        alert('¡Cotización enviada exitosamente! Te contactaremos pronto.');
+        
+        // Redirigir a la página de inicio
+        navigate('/');
+        
+      } else {
+        console.error('Error guardando lead:', result.error);
+        alert('Hubo un problema al enviar tu cotización. Por favor, intenta nuevamente.');
+      }
+      
+    } catch (error) {
+      console.error('Error al procesar la cotización:', error);
+      alert('Hubo un problema al enviar tu cotización. Por favor, intenta nuevamente.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -129,7 +202,13 @@ ${formData.budget ? `- Presupuesto aproximado: $${formData.budget} MXN` : ''}
           
           <div className="form-group">
             <label>Número de Porciones</label>
-            <select name="servings" value={formData.servings} onChange={handleChange} required>
+            <select 
+              name="servings" 
+              value={formData.servings} 
+              onChange={handleChange} 
+              required
+              disabled={isSubmitting}
+            >
               <option value="">Selecciona las porciones</option>
               <option value="8-10">8 a 10 porciones</option>
               <option value="11-15">11 a 15 porciones</option>
@@ -142,7 +221,12 @@ ${formData.budget ? `- Presupuesto aproximado: $${formData.budget} MXN` : ''}
 
           <div className="form-group">
             <label>Sabor del Pastel</label>
-            <select name="flavor" value={formData.flavor} onChange={handleChange}>
+            <select 
+              name="flavor" 
+              value={formData.flavor} 
+              onChange={handleChange}
+              disabled={isSubmitting}
+            >
               <option value="vanilla">Vainilla</option>
               <option value="vanillaNut">Vainilla con Nuez</option>
               <option value="orange">Naranja</option>
@@ -158,7 +242,12 @@ ${formData.budget ? `- Presupuesto aproximado: $${formData.budget} MXN` : ''}
 
           <div className="form-group">
             <label>Relleno</label>
-            <select name="filling" value={formData.filling} onChange={handleChange}>
+            <select 
+              name="filling" 
+              value={formData.filling} 
+              onChange={handleChange}
+              disabled={isSubmitting}
+            >
               <option value="">Selecciona un relleno</option>
               <optgroup label="Básico">
                 <option value="mermelada">Mermeladas</option>
@@ -185,6 +274,7 @@ ${formData.budget ? `- Presupuesto aproximado: $${formData.budget} MXN` : ''}
               value={formData.occasion}
               onChange={handleChange}
               placeholder="Ej: Boda, Cumpleaños, Aniversario..."
+              disabled={isSubmitting}
             />
           </div>
 
@@ -195,6 +285,7 @@ ${formData.budget ? `- Presupuesto aproximado: $${formData.budget} MXN` : ''}
               name="date"
               value={formData.date}
               onChange={handleChange}
+              disabled={isSubmitting}
             />
           </div>
 
@@ -205,6 +296,7 @@ ${formData.budget ? `- Presupuesto aproximado: $${formData.budget} MXN` : ''}
               value={formData.specialInstructions}
               onChange={handleChange}
               placeholder="Describe cómo te gustaría la decoración, alergias, o cualquier detalle especial..."
+              disabled={isSubmitting}
             />
           </div>
         </div>
@@ -220,6 +312,7 @@ ${formData.budget ? `- Presupuesto aproximado: $${formData.budget} MXN` : ''}
               value={formData.name}
               onChange={handleChange}
               required
+              disabled={isSubmitting}
             />
           </div>
 
@@ -232,6 +325,7 @@ ${formData.budget ? `- Presupuesto aproximado: $${formData.budget} MXN` : ''}
               onChange={handleChange}
               onBlur={handleBlur}
               required
+              disabled={isSubmitting}
               aria-invalid={errors.email ? "true" : "false"}
             />
             {errors.email && <span className="error-message">{errors.email}</span>}
@@ -245,6 +339,7 @@ ${formData.budget ? `- Presupuesto aproximado: $${formData.budget} MXN` : ''}
               value={formData.phone}
               onChange={handleChange}
               required
+              disabled={isSubmitting}
             />
           </div>
 
@@ -256,6 +351,7 @@ ${formData.budget ? `- Presupuesto aproximado: $${formData.budget} MXN` : ''}
               value={formData.budget}
               onChange={handleChange}
               placeholder="Opcional"
+              disabled={isSubmitting}
             />
           </div>
         </div>
@@ -263,11 +359,18 @@ ${formData.budget ? `- Presupuesto aproximado: $${formData.budget} MXN` : ''}
         <motion.button 
           className="submit-button btn-sm"
           type="submit"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          disabled={isSubmitting}
+          whileHover={!isSubmitting ? { scale: 1.05 } : {}}
+          whileTap={!isSubmitting ? { scale: 0.95 } : {}}
         >
-          Solicitar Cotización
+          {isSubmitting ? 'Enviando...' : 'Solicitar Cotización'}
         </motion.button>
+
+        {isSubmitting && (
+          <p className="loading-message">
+            Enviando tu solicitud... Por favor espera.
+          </p>
+        )}
       </form>
     </motion.div>
   );
