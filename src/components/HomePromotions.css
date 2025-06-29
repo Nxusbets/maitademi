@@ -1,0 +1,104 @@
+.promotions-section-main {
+  padding: 3rem 0 2rem 0;
+  background: var(--amplify-colors-background-secondary, #f9f9f9);
+  text-align: center;
+}
+
+.promotions-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: var(--amplify-colors-font-primary, #222);
+  letter-spacing: 1px;
+}
+
+.promotions-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.promotion-card {
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 2rem 2.5rem;
+  min-width: 320px;
+  max-width: 370px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.2s, transform 0.2s;
+  position: relative;
+}
+
+.promotion-card:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.16);
+  transform: translateY(-4px) scale(1.03);
+}
+
+.promotion-inactive {
+  opacity: 0.5;
+  filter: grayscale(0.5);
+}
+
+.promotion-badge {
+  background: #fd96c8; /* rosa pastel */
+  color: #fff;
+  font-weight: 700;
+  border-radius: 2rem;
+  padding: 0.4rem 1.2rem;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  letter-spacing: 1px;
+  display: inline-block;
+}
+
+.promotion-card-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.7rem;
+  color: var(--amplify-colors-font-primary, #222);
+}
+
+.promotion-code {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #f8b6d6; /* rosa pastel */
+  margin-bottom: 0.7rem;
+}
+
+.promotion-description {
+  font-size: 1.1rem;
+  color: #444;
+  margin-bottom: 0.7rem;
+}
+
+.promotion-discount,
+.promotion-valid {
+  font-size: 1rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+.promotion-action-btn {
+  margin-top: 1rem;
+  background: #f8b6d6; /* rosa pastel */
+  color: #fff;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s;
+}
+
+.promotion-action-btn:disabled,
+.promotion-inactive .promotion-action-btn {
+  background: #ccc;
+  cursor: not-allowed;
+}

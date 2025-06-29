@@ -10,7 +10,7 @@ import {
   orderBy,
   serverTimestamp 
 } from 'firebase/firestore';
-import { db } from '../config/firebase'; // Ahora esta ruta será correcta
+import { db } from '../config/firebase';
 
 // Servicio base genérico con operaciones CRUD completas
 const createBaseService = (collectionName) => ({
@@ -116,10 +116,10 @@ const createBaseService = (collectionName) => ({
 
 // Crear servicios específicos para cada colección
 export const productService = createBaseService('products');
-export const customerService = createBaseService('customers');
+// export const customerService = createBaseService('customers');
 export const salesService = createBaseService('sales');
 export const expenseService = createBaseService('expenses');
-export const promotionService = createBaseService('promotions'); // Asegurar que esté aquí
+export const promotionService = createBaseService('promotions');
 export const leadService = createBaseService('leads');
 
 // Servicio de estadísticas y cálculos
@@ -225,6 +225,33 @@ export const reportService = {
       return { success: true, data: categorizedExpenses };
     } catch (error) {
       console.error('Error generating expense report:', error);
+      return { success: false, error: error.message };
+    }
+  }
+};
+
+// Servicio para actualizar el estado de un lead
+export const updateLeadStatus = async (leadId, newStatus) => {
+  try {
+    const leadRef = doc(db, 'leads', leadId);
+    await updateDoc(leadRef, { status: newStatus });
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating lead status:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+// O si prefieres mantenerlo dentro de customerService:
+export const customerService = {
+  ...createBaseService('customers'),
+  async updateLeadStatus(leadId, newStatus) {
+    try {
+      const leadRef = doc(db, 'leads', leadId);
+      await updateDoc(leadRef, { status: newStatus });
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating lead status:', error);
       return { success: false, error: error.message };
     }
   }

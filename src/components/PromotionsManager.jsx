@@ -10,10 +10,11 @@ const PromotionsManager = ({ data, refreshData }) => {
   const [selectedCustomers, setSelectedCustomers] = useState([]);
   const [promotionForm, setPromotionForm] = useState({
     title: '',
+    code: '', // <-- Agregado para el código de promoción
     message: '',
     discount: '',
     validUntil: '',
-    type: 'discount', // discount, offer, announcement
+    type: 'discount',
     status: 'active'
   });
 
@@ -24,6 +25,7 @@ const PromotionsManager = ({ data, refreshData }) => {
     if (type === 'edit' && promotion) {
       setPromotionForm({
         title: promotion.title || '',
+        code: promotion.code || '', // <-- Agregado para el código de promoción
         message: promotion.message || '',
         discount: promotion.discount || '',
         validUntil: promotion.validUntil || '',
@@ -51,6 +53,7 @@ const PromotionsManager = ({ data, refreshData }) => {
   const resetForm = () => {
     setPromotionForm({
       title: '',
+      code: '', // <-- Agregado para el código de promoción
       message: '',
       discount: '',
       validUntil: '',
@@ -327,6 +330,21 @@ const PromotionsManager = ({ data, refreshData }) => {
                       required
                       disabled={isSubmitting}
                       placeholder="Ej: Descuento de Temporada"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Código</label>
+                    <input
+                      type="text"
+                      id="code"
+                      name="code"
+                      value={promotionForm.code}
+                      onChange={e => setPromotionForm({ ...promotionForm, code: e.target.value })}
+                      className="form-input"
+                      required
+                      disabled={isSubmitting}
+                      placeholder="Ej: PRIMAVERA25"
                     />
                   </div>
 

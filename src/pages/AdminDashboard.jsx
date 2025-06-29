@@ -8,9 +8,11 @@ import {
   salesService 
 } from '../services/firebaseService';
 import PromotionsManager from '../components/PromotionsManager';
-import ExpenseManager from '../components/ExpenseManager'; // Importar el nuevo componente
-import SalesManager from '../components/SalesManager'; // Agregar esta importación
-import LeadsManager from '../components/LeadsManager'; // Agregar esta importación
+import ExpenseManager from '../components/ExpenseManager';
+import SalesManager from '../components/SalesManager';
+import LeadsManager from '../components/LeadsManager';
+import ProductsManager from '../components/ProductsManager';
+import ImageUploader from '../components/ImageUploader';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -20,9 +22,9 @@ const AdminDashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showMobileMenu, setShowMobileMenu] = useState(false); // Nuevo estado
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
-  // Estados para formularios (mantener solo los necesarios)
+  // Estados para formularios
   const [newProduct, setNewProduct] = useState({
     name: '', description: '', price: '', category: '', cost: '', stock: ''
   });
@@ -35,34 +37,52 @@ const AdminDashboard = () => {
     customerId: '', customerName: '', products: [], total: '', paymentMethod: '', notes: ''
   });
 
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [productImage, setProductImage] = useState('');
+  const [selectedLead, setSelectedLead] = useState(null); // Nuevo estado para el lead seleccionado
+  const [showSaleModal, setShowSaleModal] = useState(false); // Nuevo estado para mostrar el modal de venta
+
+  // CATEGORÍAS EXISTENTES
+  const existingCategories = Array.from(
+    new Set((data.products || []).map(p => p.category).filter(Boolean))
+  );
+
   // Handlers para formularios
   const handleProductSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (isSubmitting) {
       console.log('Ya se está enviando un formulario...');
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
-      console.log('Creando producto:', newProduct);
-      const result = await productService.create({
+      const productData = {
         ...newProduct,
         price: parseFloat(newProduct.price),
         cost: parseFloat(newProduct.cost),
-        stock: parseInt(newProduct.stock)
-      });
-      
-      if (result.success) {
-        console.log('Producto creado exitosamente');
-        await refreshData();
-        closeModal();
-        resetProductForm();
+        stock: parseInt(newProduct.stock),
+        image: productImage
+      };
+
+      if (editMode && selectedProduct) {
+        // Editar producto existente
+        await productService.update(selectedProduct.id, productData);
+      } else {
+        // Crear producto nuevo
+        await productService.create(productData);
       }
+      await refreshData();
+      closeModal();
+      resetProductForm();
+      setProductImage('');
+      setEditMode(false);
+      setSelectedProduct(null);
     } catch (error) {
-      console.error('Error creating product:', error);
+      alert('Error al guardar producto');
     } finally {
       setIsSubmitting(false);
     }
@@ -79,10 +99,8 @@ const AdminDashboard = () => {
     setIsSubmitting(true);
     
     try {
-      console.log('Creando cliente:', newCustomer);
       const result = await customerService.create(newCustomer);
       if (result.success) {
-        console.log('Cliente creado exitosamente');
         await refreshData();
         closeModal();
         resetCustomerForm();
@@ -105,10 +123,8 @@ const AdminDashboard = () => {
     setIsSubmitting(true);
     
     try {
-      console.log('Creando venta:', newSale);
       const result = await salesService.create(newSale);
       if (result.success) {
-        console.log('Venta creada exitosamente');
         await refreshData();
         closeModal();
         resetSaleForm();
@@ -124,13 +140,17 @@ const AdminDashboard = () => {
   const openModal = (type) => {
     setModalType(type);
     setShowModal(true);
-    setIsSubmitting(false); // Reset del estado de envío
+    setIsSubmitting(false);
   };
 
   const closeModal = () => {
     setShowModal(false);
     setModalType('');
-    setIsSubmitting(false); // Reset del estado de envío
+    setIsSubmitting(false);
+    setEditMode(false);
+    setSelectedProduct(null);
+    setSelectedLead(null); // Reiniciar estado del lead seleccionado
+    setShowSaleModal(false); // Ocultar modal de venta si estaba abierto
   };
 
   const resetProductForm = () => {
@@ -190,10 +210,52 @@ const AdminDashboard = () => {
     }));
   };
 
-  // Nuevo: función para cerrar menú móvil al seleccionar tab
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
     setShowMobileMenu(false);
+  };
+
+  const handleEditProduct = (product) => {
+    setNewProduct({
+      name: product.name || '',
+      description: product.description || '',
+      price: product.price || '',
+      category: product.category || '',
+      cost: product.cost || '',
+      stock: product.stock || '',
+    });
+    setProductImage(product.image || '');
+    setSelectedProduct(product);
+    setEditMode(true);
+    setModalType('product');
+    setShowModal(true);
+    setIsSubmitting(false);
+  };
+
+  const handleDeleteProduct = async (productId) => {
+    if (window.confirm('¿Seguro que deseas eliminar este producto?')) {
+      setIsSubmitting(true);
+      try {
+        await productService.delete(productId);
+        await refreshData();
+      } catch (error) {
+        alert('Error al eliminar producto');
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
+
+  const updateLeadStatus = async (leadId, newStatus) => {
+    setIsSubmitting(true);
+    try {
+      await customerService.updateLeadStatus(leadId, newStatus);
+      await refreshData();
+    } catch (error) {
+      alert('Error al actualizar el estado');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderTabContent = () => {
@@ -312,12 +374,18 @@ const AdminDashboard = () => {
               <div className="summary-card">
                 <h4 className="summary-title">Solicitudes Recientes</h4>
                 {data.leads
-                  .filter(lead => lead.status === 'new' || !lead.status)
                   .slice(0, 5)
                   .map(lead => (
                     <div key={lead.id} className="summary-item">
                       <span className="summary-customer">{lead.name}</span>
                       <span className="summary-event">{lead.eventType || 'Cotización'}</span>
+                      <span className={`summary-status status-${lead.status || 'new'}`}>
+                        {lead.status === 'new' && 'Nueva'}
+                        {lead.status === 'in_progress' && 'En Proceso'}
+                        {lead.status === 'completed' && 'Completada'}
+                        {lead.status === 'cancelled' && 'Cancelada'}
+                        {!lead.status && 'Nueva'}
+                      </span>
                     </div>
                   ))}
               </div>
@@ -347,7 +415,12 @@ const AdminDashboard = () => {
             <div className="section-header">
               <h2 className="section-title">Productos</h2>
               <button
-                onClick={() => openModal('product')}
+                onClick={() => {
+                  resetProductForm();
+                  setEditMode(false);
+                  setSelectedProduct(null);
+                  openModal('product');
+                }}
                 className="add-button product"
               >
                 + Nuevo Producto
@@ -364,6 +437,7 @@ const AdminDashboard = () => {
                     <th className="table-cell">Costo</th>
                     <th className="table-cell">Stock</th>
                     <th className="table-cell">Categoría</th>
+                    <th className="table-cell">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -377,6 +451,20 @@ const AdminDashboard = () => {
                         {product.stock}
                       </td>
                       <td className="table-cell secondary">{product.category}</td>
+                      <td className="table-cell">
+                        <button
+                          className="edit-button"
+                          onClick={() => handleEditProduct(product)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className="delete-button"
+                          onClick={() => handleDeleteProduct(product.id)}
+                        >
+                          Eliminar
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -435,7 +523,59 @@ const AdminDashboard = () => {
         return <PromotionsManager data={data} refreshData={refreshData} />;
 
       case 'leads':
-        return <LeadsManager data={data} refreshData={refreshData} />;
+        return (
+          <div className="content-section">
+            <div className="section-header">
+              <h2 className="section-title">Solicitudes</h2>
+            </div>
+            <div className="table-container">
+              <table className="data-table">
+                <thead>
+                  <tr className="table-header">
+                    <th className="table-cell">Nombre</th>
+                    <th className="table-cell">Correo</th>
+                    <th className="table-cell">Evento</th>
+                    <th className="table-cell">Estado</th>
+                    <th className="table-cell">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.leads.map(lead => (
+                    <tr key={lead.id} className="table-row">
+                      <td className="table-cell">{lead.name}</td>
+                      <td className="table-cell">{lead.email}</td>
+                      <td className="table-cell">{lead.eventType || 'Cotización'}</td>
+                      <td className="table-cell">
+                        <select
+                          value={lead.status || 'new'}
+                          onChange={async (e) => {
+                            const newStatus = e.target.value;
+                            if (newStatus === 'completed') {
+                              setSelectedLead(lead); // Nuevo estado para saber qué lead se está completando
+                              setShowSaleModal(true); // Nuevo estado para mostrar el modal de venta
+                            } else {
+                              await updateLeadStatus(lead.id, newStatus);
+                            }
+                          }}
+                          className="form-input"
+                          disabled={isSubmitting}
+                        >
+                          <option value="new">Nueva</option>
+                          <option value="in_progress">En Proceso</option>
+                          <option value="completed">Completada</option>
+                          <option value="cancelled">Cancelada</option>
+                        </select>
+                      </td>
+                      <td className="table-cell">
+                        {/* Puedes agregar más acciones aquí si lo deseas */}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
 
       default:
         return <div>Selecciona una opción del menú</div>;
@@ -544,8 +684,20 @@ const AdminDashboard = () => {
             >
               {modalType === 'product' && (
                 <form onSubmit={handleProductSubmit}>
-                  <h3 className="modal-title">Nuevo Producto</h3>
+                  <h3 className="modal-title">
+                    {editMode ? 'Editar Producto' : 'Nuevo Producto'}
+                  </h3>
                   
+                  {/* NUEVO: Subida de imagen */}
+                  <div className="form-group">
+                    <label className="form-label">Imagen del Producto</label>
+                    <ImageUploader
+                      onImageUpload={result => setProductImage(result.url)}
+                      currentImage={productImage}
+                      category="products"
+                    />
+                  </div>
+
                   <div className="form-group">
                     <label className="form-label">Nombre del Producto</label>
                     <input
@@ -596,13 +748,27 @@ const AdminDashboard = () => {
 
                   <div className="form-group">
                     <label className="form-label">Categoría</label>
-                    <input
-                      type="text"
+                    <select
                       value={newProduct.category}
-                      onChange={(e) => setNewProduct(prev => ({ ...prev, category: e.target.value }))}
+                      onChange={e => setNewProduct(prev => ({ ...prev, category: e.target.value }))}
                       className="form-input"
                       required
-                    />
+                    >
+                      <option value="">Selecciona o escribe una categoría</option>
+                      {existingCategories.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                      <option value="__new__">+ Nueva categoría...</option>
+                    </select>
+                    {newProduct.category === "__new__" && (
+                      <input
+                        type="text"
+                        placeholder="Nueva categoría"
+                        className="form-input"
+                        autoFocus
+                        onChange={e => setNewProduct(prev => ({ ...prev, category: e.target.value }))}
+                      />
+                    )}
                   </div>
 
                   <div className="form-group">
@@ -621,7 +787,7 @@ const AdminDashboard = () => {
                       Cancelar
                     </button>
                     <button type="submit" className="submit-button product">
-                      Guardar Producto
+                      {editMode ? 'Guardar Cambios' : 'Guardar Producto'}
                     </button>
                   </div>
                 </form>
@@ -745,19 +911,46 @@ const AdminDashboard = () => {
 
                       {newSale.products.map((product, index) => (
                         <div key={index} className="product-row">
-                          <input
-                            type="text"
-                            value={product.name}
-                            onChange={(e) => updateProductInSale(index, 'name', e.target.value)}
-                            placeholder="Nombre del producto"
+                          <select
+                            value={product.productId || ''}
+                            onChange={e => {
+                              const selectedId = e.target.value;
+                              if (selectedId === 'custom') {
+                                updateProductInSale(index, 'productId', 'custom');
+                                updateProductInSale(index, 'name', '');
+                                updateProductInSale(index, 'price', '');
+                              } else {
+                                const prod = data.products.find(p => p.id === selectedId);
+                                updateProductInSale(index, 'productId', prod.id);
+                                updateProductInSale(index, 'name', prod.name);
+                                updateProductInSale(index, 'price', prod.price);
+                              }
+                            }}
                             className="product-input"
                             required
-                          />
+                          >
+                            <option value="">Selecciona producto</option>
+                            {data.products.map(prod => (
+                              <option key={prod.id} value={prod.id}>{prod.name}</option>
+                            ))}
+                            <option value="custom">Pastel personalizado</option>
+                          </select>
+                          {/* Si es personalizado, deja escribir el nombre */}
+                          {product.productId === 'custom' && (
+                            <input
+                              type="text"
+                              value={product.name}
+                              onChange={e => updateProductInSale(index, 'name', e.target.value)}
+                              placeholder="Nombre personalizado"
+                              className="product-input"
+                              required
+                            />
+                          )}
                           <input
                             type="number"
                             step="0.01"
                             value={product.price}
-                            onChange={(e) => updateProductInSale(index, 'price', e.target.value)}
+                            onChange={e => updateProductInSale(index, 'price', e.target.value)}
                             placeholder="Precio"
                             className="product-input price"
                             required
@@ -765,7 +958,7 @@ const AdminDashboard = () => {
                           <input
                             type="number"
                             value={product.quantity}
-                            onChange={(e) => updateProductInSale(index, 'quantity', e.target.value)}
+                            onChange={e => updateProductInSale(index, 'quantity', e.target.value)}
                             placeholder="Cantidad"
                             className="product-input quantity"
                             required
@@ -909,6 +1102,184 @@ const AdminDashboard = () => {
                   </div>
                 </form>
               )}
+            </motion.div>
+          </motion.div>
+        )}
+
+        {showSaleModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="modal-overlay"
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              className="modal-content"
+            >
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setIsSubmitting(true);
+                  try {
+                    await salesService.create({
+                      customerName: selectedLead.name,
+                      customerEmail: selectedLead.email,
+                      products: newSale.products,
+                      total: newSale.total,
+                      paymentMethod: newSale.paymentMethod,
+                      notes: newSale.notes,
+                    });
+
+                    // Descontar stock de productos registrados
+                    for (const product of newSale.products) {
+                      if (product.productId && product.productId !== 'custom') {
+                        const prod = data.products.find(p => p.id === product.productId);
+                        if (prod) {
+                          const newStock = (parseInt(prod.stock, 10) || 0) - (parseInt(product.quantity, 10) || 0);
+                          await productService.update(prod.id, { stock: newStock });
+                        }
+                      }
+                    }
+
+                    await updateLeadStatus(selectedLead.id, 'completed');
+                    setShowSaleModal(false);
+                    setSelectedLead(null);
+                    resetSaleForm();
+                    await refreshData();
+                  } catch (error) {
+                    alert('Error al registrar la venta');
+                  } finally {
+                    setIsSubmitting(false);
+                  }
+                }}
+              >
+                <h3 className="modal-title">Registrar Venta de Solicitud</h3>
+                <div className="form-group">
+                  <label className="form-label">Productos</label>
+                  <div className="products-container">
+                    {newSale.products.length === 0 && (
+                      <span className="products-placeholder">
+                        Agregar productos a la venta
+                      </span>
+                    )}
+                    {newSale.products.map((product, index) => (
+                      <div key={index} className="product-row">
+                        <select
+                          value={product.productId || ''}
+                          onChange={e => {
+                            const selectedId = e.target.value;
+                            if (selectedId === 'custom') {
+                              updateProductInSale(index, 'productId', 'custom');
+                              updateProductInSale(index, 'name', '');
+                              updateProductInSale(index, 'price', '');
+                            } else {
+                              const prod = data.products.find(p => p.id === selectedId);
+                              updateProductInSale(index, 'productId', prod.id);
+                              updateProductInSale(index, 'name', prod.name);
+                              updateProductInSale(index, 'price', prod.price);
+                            }
+                          }}
+                          className="product-input"
+                          required
+                        >
+                          <option value="">Selecciona producto</option>
+                          {data.products.map(prod => (
+                            <option key={prod.id} value={prod.id}>{prod.name}</option>
+                          ))}
+                          <option value="custom">Pastel personalizado</option>
+                        </select>
+                        {/* Si es personalizado, deja escribir el nombre */}
+                        {product.productId === 'custom' && (
+                          <input
+                            type="text"
+                            value={product.name}
+                            onChange={e => updateProductInSale(index, 'name', e.target.value)}
+                            placeholder="Nombre personalizado"
+                            className="product-input"
+                            required
+                          />
+                        )}
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={product.price}
+                          onChange={e => updateProductInSale(index, 'price', e.target.value)}
+                          placeholder="Precio"
+                          className="product-input price"
+                          required
+                        />
+                        <input
+                          type="number"
+                          value={product.quantity}
+                          onChange={e => updateProductInSale(index, 'quantity', e.target.value)}
+                          placeholder="Cantidad"
+                          className="product-input quantity"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeProductFromSale(index)}
+                          className="remove-button"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={addProductToSale}
+                      className="add-product-button"
+                    >
+                      + Agregar Producto
+                    </button>
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Total</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={newSale.total}
+                    onChange={(e) => setNewSale(prev => ({ ...prev, total: e.target.value }))}
+                    className="form-input"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Método de Pago</label>
+                  <select
+                    value={newSale.paymentMethod}
+                    onChange={(e) => setNewSale(prev => ({ ...prev, paymentMethod: e.target.value }))}
+                    className="form-input"
+                    required
+                  >
+                    <option value="">Seleccionar método de pago</option>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="tarjeta">Tarjeta</option>
+                    <option value="transferencia">Transferencia</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Notas</label>
+                  <textarea
+                    value={newSale.notes}
+                    onChange={(e) => setNewSale(prev => ({ ...prev, notes: e.target.value }))}
+                    rows="3"
+                    className="form-textarea"
+                  />
+                </div>
+                <div className="modal-actions">
+                  <button type="button" onClick={() => setShowSaleModal(false)} className="cancel-button">
+                    Cancelar
+                  </button>
+                  <button type="submit" className="submit-button sale" disabled={isSubmitting}>
+                    Registrar Venta
+                  </button>
+                </div>
+              </form>
             </motion.div>
           </motion.div>
         )}

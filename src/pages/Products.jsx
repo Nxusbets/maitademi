@@ -1,4 +1,4 @@
-import './Products.css'; // Asegúrate de crear este archivo CSS
+import './Products.css';
 import { 
   Collection,
   Card,
@@ -9,72 +9,14 @@ import {
   Flex,
   Badge
 } from '@aws-amplify/ui-react';
+import { useFirebaseData } from '../hooks/useFirebaseData'; // Asegúrate de tener este hook
 
 const Products = () => {
-  const products = [
-    {
-      id: 1,
-      name: 'Pastel de Chocolate',
-      price: 225,
-      description: 'Relleno de ganache de chocolate, cobertura en crema de chocolate (8 porciones)',
-      image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748207926/1000075607_bhalw8.jpg",
-    },
-    {
-      id: 2,
-      name: 'Panqué de Vainilla o Naranja con Nuez',
-      price: 120,
-      description: 'Panqué de 8 porciones con sabor a vainilla o naranja, acompañado de nuez.',
-      image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748207926/1000075619_dpios8.jpg",
-    },
-    {
-      id: 3,
-      name: 'Panqué de Queso Crema',
-      price: 190,
-      description: 'Decorado con crema de queso y canela (8 porciones).',
-      image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748207927/1000075613_lego7g.jpg",
-    },
-    {
-      id: 4,
-      name: 'Flan Napolitano',
-      price: 280,
-      description: 'Flan clásico napolitano (8 porciones).',
-      image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748207926/1000075616_tnwkxo.jpg",
-    },
-    {
-      id: 5,
-      name: 'Cheesecake',
-      price: 360,
-      description: '8-10 porciones decorado con chocolate y nuez.',
-      image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748207926/1000075619_dpios8.jpg",
-    },
-    {
-      id: 6,
-      name: 'Pastel Red Velvet',
-      price: 420,
-      description: 'Pastel en capas relleno de crema de queso, decoración en líneas de chocolate oscuro y cerezas (8 porciones).',
-      image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748208179/1000075622_hqlryf.jpg",
-    },
-    {
-      id: 7,
-      name: 'Pastel de Zanahoria',
-      price: 380,
-      description: 'Bizcocho con nuez, pasitas, zanahoria y canela. Relleno y cobertura en crema de queso (8 porciones).',
-      image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748207926/1000075625_dlqevp.jpg",
-    },
-    {
-      id: 8,
-      name: 'Gelatinas Individuales (Varios Sabores)',
-      price: 25,
-      description: 'Sabores: mosaico, yogurt, rompope, tres leches con fruta encapsulada.',
-      image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748207926/1000075628_goy6un.jpg",
-    }
-  ];
+  const { data, loading } = useFirebaseData();
 
-  const generateWhatsAppLink = (product) => {
-    const phoneNumber = "523326827809";
-    const message = `Hola, me gustaría solicitar: ${product.name} - $${product.price} MXN`;
-    return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-  };
+  if (loading) {
+    return <div>Cargando productos...</div>;
+  }
 
   return (
     <Flex direction="column" padding="medium">
@@ -86,41 +28,78 @@ const Products = () => {
       </Text>
       
       <Collection
-        items={products}
+        items={data.products}
         type="grid"
         gap="medium"
         templateColumns="repeat(auto-fit, minmax(300px, 1fr))"
       >
         {(product) => (
           <Card key={product.id} variation="elevated" className="product-card">
-            <div className="image-container">
+            <div className="image-container" style={{ position: 'relative' }}>
               <Image
                 src={product.image}
                 alt={product.name}
                 className="product-image"
+                style={{ borderRadius: '16px', objectFit: 'cover', height: 220, width: '100%' }}
               />
+              {/* Badge de categoría elegante */}
+              {product.category && (
+                <Badge
+                  variation="info"
+                  style={{
+                    position: 'absolute',
+                    top: 16,
+                    left: 16,
+                    background: '#fff',
+                    color: '#DB7093',
+                    fontWeight: 'bold',
+                    borderRadius: '12px',
+                    padding: '4px 12px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                    fontSize: 13,
+                    letterSpacing: 1
+                  }}
+                >
+                  {product.category}
+                </Badge>
+              )}
+              {/* Badge especial si existe */}
               {product.badge && (
                 <Badge
                   variation={product.badge === "Opción Diabética" ? "success" : 
-                           product.badge === "Saludable" ? "info" : "warning"}
-                  position="absolute"
-                  top="10px"
-                  right="10px"
-                  backgroundColor={product.badge === "Opción Diabética" ? "#4CAF50" : 
-                                 product.badge === "Saludable" ? "#2196F3" : "#FF9800"}
+                             product.badge === "Saludable" ? "info" : "warning"}
+                  style={{
+                    position: 'absolute',
+                    top: 16,
+                    right: 16,
+                    backgroundColor: product.badge === "Opción Diabética" ? "#4CAF50" : 
+                                     product.badge === "Saludable" ? "#2196F3" : "#FF9800",
+                    color: "#fff",
+                    fontWeight: 'bold',
+                    borderRadius: '12px',
+                    padding: '4px 12px',
+                    fontSize: 13,
+                    letterSpacing: 1
+                  }}
                 >
                   {product.badge}
                 </Badge>
               )}
             </div>
-            <Flex direction="column" padding="medium">
-              <Heading level={3}>{product.name}</Heading>
-              <Text>{product.description}</Text>
+            <Flex direction="column" padding="medium" gap="xs">
+              <Heading level={3} marginBottom="xxs" style={{ color: "#DB7093" }}>
+                {product.name}
+              </Heading>
+              <Text fontSize="small" color="gray" marginBottom="xxs" fontStyle="italic">
+                {product.description}
+              </Text>
               <Text
                 fontSize="large"
                 fontWeight="bold"
                 color="#DB7093"
                 marginTop="small"
+                marginBottom="small"
+                style={{ fontSize: 22 }}
               >
                 ${product.price} MXN
               </Text>
@@ -128,6 +107,7 @@ const Products = () => {
                 variation="primary"
                 onClick={() => window.open(generateWhatsAppLink(product), '_blank')}
                 marginTop="medium"
+                style={{ borderRadius: 20, fontWeight: 'bold', background: "#DB7093", border: "none" }}
               >
                 Solicitar postre
               </Button>
@@ -137,6 +117,13 @@ const Products = () => {
       </Collection>
     </Flex>
   );
+};
+
+// Utiliza la misma función para WhatsApp
+const generateWhatsAppLink = (product) => {
+  const phoneNumber = "523326827809";
+  const message = `Hola, me gustaría solicitar: ${product.name} - $${product.price} MXN`;
+  return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 };
 
 export default Products;

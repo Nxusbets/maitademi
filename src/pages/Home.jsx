@@ -12,6 +12,7 @@ import './Home.css';
 import { motion } from 'framer-motion';
 import React from 'react';
 import Welcome from '../components/Welcome';
+import HomePromotions from '../components/HomePromotions'; // <-- Agrega esta línea
 
 const Home = () => {
   const { tokens } = useTheme();
@@ -51,6 +52,11 @@ const Home = () => {
               </Text>
             </div>
           </Flex>
+        </section>
+
+        {/* Promociones Section */}
+        <section className="promotions-section">
+          <HomePromotions />
         </section>
 
         {/* Gallery Section */}

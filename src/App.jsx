@@ -12,7 +12,7 @@ import { theme } from './theme';
 import './App.css';
 import Testimonials from './components/Testimonials';
 import Faqs from './pages/faqs';
-import PromotionsBanner from './components/PromotionsBanner';
+
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AdminDashboard from './pages/AdminDashboard';
 import AvisoPrivacidad from './components/AvisoPrivacidad';
@@ -36,7 +36,6 @@ function App() {
               <Route path="/" element={
                 <>
                   <Home />
-                  <PromotionsBanner />
                   <Testimonials />
                   <Faqs />
                 </>
