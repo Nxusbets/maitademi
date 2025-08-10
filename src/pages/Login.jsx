@@ -1,30 +1,31 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { customerService } from '../services/firebaseService';
 import './Login.css';
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const { login } = useAuth();
+  const { login, setUser } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
-
+    setError('');
     try {
-      const result = await login(formData.username, formData.password);
+      const result = await customerService.login(formData.email, formData.password);
       if (result.success) {
-        navigate('/dashboard');
+        setUser(result.data); // Guarda el usuario en el contexto
+        navigate('/perfil');
       } else {
-        setError(result.error || 'Error al iniciar sesión');
+        setError(result.error || 'Credenciales incorrectas');
       }
     } catch (error) {
       setError('Error de conexión');
@@ -45,19 +46,19 @@ const Login = () => {
       <div className="login-card">
         <div className="login-header">
           <h1>Maitademi</h1>
-          <p>Panel de Administración</p>
+          <p>Iniciar Sesión Cliente</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
+        <form onSubmit={handleLogin} className="login-form">
           {error && <div className="error-message">{error}</div>}
           
           <div className="form-group">
-            <label htmlFor="username">Usuario</label>
+            <label htmlFor="email">Correo Electrónico</label>
             <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
               onChange={handleChange}
               disabled={loading}
               required
@@ -85,12 +86,6 @@ const Login = () => {
             {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
         </form>
-
-        <div className="login-footer">
-          <div className="demo-credentials">
-            <p><strong>Demo:</strong> admin / maitademi2024</p>
-          </div>
-        </div>
       </div>
     </div>
   );

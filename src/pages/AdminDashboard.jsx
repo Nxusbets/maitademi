@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useFirebaseData } from '../hooks/useFirebaseData';
-import { 
-  productService, 
-  customerService, 
+import {
+  productService,
+  customerService,
   salesService,
   leadService
 } from '../services/firebaseService';
@@ -118,18 +118,21 @@ const AdminDashboard = () => {
     }
   };
 
+  const generateFolio = () => 'FOLIO-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+
   const handleSaleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (isSubmitting) {
       console.log('Ya se está enviando un formulario...');
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
-      const result = await salesService.create(newSale);
+      const folio = generateFolio();
+      const result = await salesService.create({ ...newSale, folio });
       if (result.success) {
         await refreshData();
         closeModal();
@@ -196,14 +199,17 @@ const AdminDashboard = () => {
   const addProductToSale = () => {
     setNewSale(prev => ({
       ...prev,
-      products: [...prev.products, { name: '', price: '', quantity: 1 }]
+      products: [
+        ...prev.products,
+        { name: '', price: '', quantity: 1, puntos: 0 }
+      ]
     }));
   };
 
   const updateProductInSale = (index, field, value) => {
     setNewSale(prev => ({
       ...prev,
-      products: prev.products.map((product, i) => 
+      products: prev.products.map((product, i) =>
         i === index ? { ...product, [field]: value } : product
       )
     }));
@@ -316,7 +322,7 @@ const AdminDashboard = () => {
         return (
           <div className="content-section">
             <h2 className="dashboard-title">Panel de Control</h2>
-            
+
             {/* Tarjetas de estadísticas */}
             <div className="stats-grid">
               <motion.div
@@ -660,10 +666,10 @@ const AdminDashboard = () => {
                       <td className="table-cell">{lead.name}</td>
                       <td className="table-cell">{lead.phone}</td>
                       <td className="table-cell">
-                        {lead.message 
-                          ? lead.message 
-                          : lead.cakeDetails 
-                            ? `Pastel: ${lead.cakeDetails.flavor || ''} ${lead.cakeDetails.servings ? `(${lead.cakeDetails.servings} porciones)` : ''}` 
+                        {lead.message
+                          ? lead.message
+                          : lead.cakeDetails
+                            ? `Pastel: ${lead.cakeDetails.flavor || ''} ${lead.cakeDetails.servings ? `(${lead.cakeDetails.servings} porciones)` : ''}`
                             : 'Sin detalles'}
                       </td>
                       <td className="table-cell">
@@ -734,7 +740,7 @@ const AdminDashboard = () => {
     <div className="admin-dashboard">
       {/* Overlay para cerrar menú móvil */}
       {showMobileMenu && (
-        <div 
+        <div
           className="mobile-overlay"
           onClick={() => setShowMobileMenu(false)}
         />
@@ -744,9 +750,9 @@ const AdminDashboard = () => {
         <div className="sidebar-header">
           <h2 className="sidebar-title">Maitademi</h2>
           <p className="sidebar-subtitle">Panel de Administración</p>
-          
+
           {/* Botón hamburguesa para móvil */}
-          <button 
+          <button
             className="mobile-menu-toggle"
             onClick={() => setShowMobileMenu(!showMobileMenu)}
             aria-label="Toggle menu"
@@ -801,7 +807,7 @@ const AdminDashboard = () => {
             </div>
           </div>
         )}
-        
+
         {!loading && renderTabContent()}
       </div>
 
@@ -825,7 +831,7 @@ const AdminDashboard = () => {
                   <h3 className="modal-title">
                     {editMode ? 'Editar Producto' : 'Nuevo Producto'}
                   </h3>
-                  
+
                   {/* NUEVO: Subida de imagen */}
                   <div className="form-group">
                     <label className="form-label">Imagen del Producto</label>
@@ -934,7 +940,7 @@ const AdminDashboard = () => {
               {modalType === 'customer' && (
                 <form onSubmit={handleCustomerSubmit}>
                   <h3 className="modal-title">Nuevo Cliente</h3>
-                  
+
                   <div className="form-group">
                     <label className="form-label">Nombre</label>
                     <input
@@ -1013,15 +1019,15 @@ const AdminDashboard = () => {
               {modalType === 'sale' && (
                 <form onSubmit={handleSaleSubmit}>
                   <h3 className="modal-title">Nueva Venta</h3>
-                  
+
                   <div className="form-group">
                     <label className="form-label">Cliente</label>
                     <select
                       value={newSale.customerId}
                       onChange={(e) => {
                         const selectedCustomer = data.customers.find(c => c.id === e.target.value);
-                        setNewSale(prev => ({ 
-                          ...prev, 
+                        setNewSale(prev => ({
+                          ...prev,
                           customerId: e.target.value,
                           customerName: selectedCustomer ? selectedCustomer.name : ''
                         }));
@@ -1049,58 +1055,44 @@ const AdminDashboard = () => {
 
                       {newSale.products.map((product, index) => (
                         <div key={index} className="product-row">
-                          <select
-                            value={product.productId || ''}
-                            onChange={e => {
-                              const selectedId = e.target.value;
-                              if (selectedId === 'custom') {
-                                updateProductInSale(index, 'productId', 'custom');
-                                updateProductInSale(index, 'name', '');
-                                updateProductInSale(index, 'price', '');
-                              } else {
-                                const prod = data.products.find(p => p.id === selectedId);
-                                updateProductInSale(index, 'productId', prod.id);
-                                updateProductInSale(index, 'name', prod.name);
-                                updateProductInSale(index, 'price', prod.price);
-                              }
-                            }}
+                          <input
+                            type="text"
+                            placeholder="Nombre"
                             className="product-input"
+                            value={product.name}
+                            onChange={e => updateProductInSale(index, 'name', e.target.value)}
                             required
-                          >
-                            <option value="">Selecciona producto</option>
-                            {data.products.map(prod => (
-                              <option key={prod.id} value={prod.id}>{prod.name}</option>
-                            ))}
-                            <option value="custom">Pastel personalizado</option>
-                          </select>
-                          {/* Si es personalizado, deja escribir el nombre */}
-                          {product.productId === 'custom' && (
-                            <input
-                              type="text"
-                              value={product.name}
-                              onChange={e => updateProductInSale(index, 'name', e.target.value)}
-                              placeholder="Nombre personalizado"
-                              className="product-input"
-                              required
-                            />
-                          )}
+                          />
                           <input
                             type="number"
-                            step="0.01"
-                            value={product.price}
-                            onChange={e => updateProductInSale(index, 'price', e.target.value)}
                             placeholder="Precio"
-                            className="product-input price"
+                            className="product-input"
+                            min={0}
+                            value={product.price}
+                            onChange={e => updateProductInSale(index, 'price', parseFloat(e.target.value) || 0)}
                             required
                           />
                           <input
                             type="number"
-                            value={product.quantity}
-                            onChange={e => updateProductInSale(index, 'quantity', e.target.value)}
                             placeholder="Cantidad"
-                            className="product-input quantity"
+                            className="product-input"
+                            min={1}
+                            value={product.quantity}
+                            onChange={e => updateProductInSale(index, 'quantity', parseInt(e.target.value, 10) || 1)}
                             required
                           />
+                          <input
+                            type="number"
+                            placeholder="Puntos"
+                            className="product-input"
+                            min={0}
+                            value={product.puntos || 0}
+                            onChange={e => updateProductInSale(index, 'puntos', parseInt(e.target.value, 10) || 0)}
+                            required
+                          />
+                          <span className="product-total">
+                            {(product.price * product.quantity).toFixed(2)}
+                          </span>
                           <button
                             type="button"
                             onClick={() => removeProductFromSale(index)}
@@ -1119,6 +1111,19 @@ const AdminDashboard = () => {
                         + Agregar Producto
                       </button>
                     </div>
+                  </div>
+
+                  {/* NUEVO: Total de puntos a asignar */}
+                  <div className="form-group">
+                    <label className="form-label">Total de puntos a asignar</label>
+                    <span style={{ fontWeight: 'bold', fontSize: '1.2em' }}>
+                      {
+                        newSale.products.reduce(
+                          (acc, prod) => acc + ((parseInt(prod.puntos, 10) || 0) * (parseInt(prod.quantity, 10) || 1)),
+                          0
+                        )
+                      }
+                    </span>
                   </div>
 
                   <div className="form-group">
@@ -1151,7 +1156,7 @@ const AdminDashboard = () => {
                       Cancelar
                     </button>
                     <button type="submit" className="submit-button sale">
-                      Guardar Venta
+                      Crear
                     </button>
                   </div>
                 </form>
@@ -1160,7 +1165,7 @@ const AdminDashboard = () => {
               {modalType === 'expense' && (
                 <form onSubmit={handleExpenseSubmit}>
                   <h3 className="modal-title">Nuevo Gasto</h3>
-                  
+
                   <div className="form-group">
                     <label className="form-label">Descripción</label>
                     <input
@@ -1222,16 +1227,16 @@ const AdminDashboard = () => {
                   </div>
 
                   <div className="modal-actions">
-                    <button 
-                      type="button" 
-                      onClick={closeModal} 
+                    <button
+                      type="button"
+                      onClick={closeModal}
                       className="cancel-button"
                       disabled={isSubmitting}
                     >
                       Cancelar
                     </button>
-                    <button 
-                      type="submit" 
+                    <button
+                      type="submit"
                       className="submit-button expense"
                       disabled={isSubmitting}
                     >
@@ -1305,58 +1310,44 @@ const AdminDashboard = () => {
                     )}
                     {newSale.products.map((product, index) => (
                       <div key={index} className="product-row">
-                        <select
-                          value={product.productId || ''}
-                          onChange={e => {
-                            const selectedId = e.target.value;
-                            if (selectedId === 'custom') {
-                              updateProductInSale(index, 'productId', 'custom');
-                              updateProductInSale(index, 'name', '');
-                              updateProductInSale(index, 'price', '');
-                            } else {
-                              const prod = data.products.find(p => p.id === selectedId);
-                              updateProductInSale(index, 'productId', prod.id);
-                              updateProductInSale(index, 'name', prod.name);
-                              updateProductInSale(index, 'price', prod.price);
-                            }
-                          }}
+                        <input
+                          type="text"
+                          placeholder="Nombre"
                           className="product-input"
+                          value={product.name}
+                          onChange={e => updateProductInSale(index, 'name', e.target.value)}
                           required
-                        >
-                          <option value="">Selecciona producto</option>
-                          {data.products.map(prod => (
-                            <option key={prod.id} value={prod.id}>{prod.name}</option>
-                          ))}
-                          <option value="custom">Pastel personalizado</option>
-                        </select>
-                        {/* Si es personalizado, deja escribir el nombre */}
-                        {product.productId === 'custom' && (
-                          <input
-                            type="text"
-                            value={product.name}
-                            onChange={e => updateProductInSale(index, 'name', e.target.value)}
-                            placeholder="Nombre personalizado"
-                            className="product-input"
-                            required
-                          />
-                        )}
+                        />
                         <input
                           type="number"
-                          step="0.01"
-                          value={product.price}
-                          onChange={e => updateProductInSale(index, 'price', e.target.value)}
                           placeholder="Precio"
-                          className="product-input price"
+                          className="product-input"
+                          min={0}
+                          value={product.price}
+                          onChange={e => updateProductInSale(index, 'price', parseFloat(e.target.value) || 0)}
                           required
                         />
                         <input
                           type="number"
-                          value={product.quantity}
-                          onChange={e => updateProductInSale(index, 'quantity', e.target.value)}
                           placeholder="Cantidad"
-                          className="product-input quantity"
+                          className="product-input"
+                          min={1}
+                          value={product.quantity}
+                          onChange={e => updateProductInSale(index, 'quantity', parseInt(e.target.value, 10) || 1)}
                           required
                         />
+                        <input
+                          type="number"
+                          placeholder="Puntos"
+                          className="product-input"
+                          min={0}
+                          value={product.puntos || 0}
+                          onChange={e => updateProductInSale(index, 'puntos', parseInt(e.target.value, 10) || 0)}
+                          required
+                        />
+                        <span className="product-total">
+                          {(product.price * product.quantity).toFixed(2)}
+                        </span>
                         <button
                           type="button"
                           onClick={() => removeProductFromSale(index)}

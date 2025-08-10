@@ -1,0 +1,37 @@
+/* Aumenta el ancho del modal */
+.modal-content {
+  max-width: 850px;
+  width: 105vw;
+  min-width: 800px;
+  padding: 32px 28px;
+}
+
+/* Haz los inputs de producto más anchos y con espacio */
+.product-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.product-input {
+  min-width: 120px;
+  padding: 8px;
+  font-size: 1em;
+}
+
+.product-input.puntos {
+  min-width: 100px;
+  font-weight: bold;
+  background: #f7f7fa;
+  border: 1.5px solid #b3b3b3;
+}
+
+/* Opcional: mejora el botón de eliminar producto */
+.remove-button {
+  font-size: 1em;
+  color: #c00;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 8px;
+}

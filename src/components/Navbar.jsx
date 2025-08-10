@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../contexts/AuthContext';
 import './Navbar.css';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
 
   const navLinks = [
     { path: '/', label: 'Inicio', icon: '🏠' },
     { path: '/products', label: 'Pasteles', icon: '🎂' },
     { path: '/custom-cake', label: 'Personalizar', icon: '✨' },
-    { path: '/contact', label: 'Contacto', icon: '📞' }
+    { path: '/contact', label: 'Contacto', icon: '📞' },
+    // Elimina el registro si el usuario está autenticado
+    ...(!isAuthenticated ? [{ path: '/registro', label: 'Registro', icon: '📝' }] : [])
   ];
 
   useEffect(() => {
@@ -22,6 +27,12 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated && location.pathname === '/login') {
+      navigate('/perfil', { replace: true });
+    }
+  }, [isAuthenticated, location.pathname, navigate]);
 
   return (
     <>
@@ -73,18 +84,40 @@ const Navbar = () => {
                 </Link>
               </motion.div>
             ))}
+            {/* SOLO uno de estos dos bloques debe aparecer */}
+            {!isAuthenticated ? (
+              <motion.div
+                className="nav-link-wrapper"
+                whileHover={{ y: -2, scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Link 
+                  to="/login"
+                  className={`nav-link ${location.pathname === '/login' ? 'active' : ''}`}
+                  aria-current={location.pathname === '/login' ? "page" : undefined}
+                >
+                  <span className="nav-link-icon">🔑</span>
+                  <span className="nav-link-text">Iniciar Sesión</span>
+                  {location.pathname === '/login' && (
+                    <motion.div 
+                      className="underline"
+                      layoutId="underline"
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  )}
+                </Link>
+              </motion.div>
+            ) : (
+              <div className="user-greeting">
+                Hola <Link to="/perfil"><strong>{user?.name || user?.username || user?.email}</strong></Link>
+                <button className="logout-btn" onClick={logout}>Salir</button>
+              </div>
+            )}
           </div>
 
-          <motion.button 
-            className="order-button"
-            whileHover={{ scale: 1.05, boxShadow: "0 5px 15px rgba(255, 105, 180, 0.3)" }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Link to="/custom-cake">
-              <span className="button-icon">🎨</span>
-              <span className="button-text">Diseña tu Pastel</span>
-            </Link>
-          </motion.button>
+       
 
           <motion.button
             className="menu-toggle"
@@ -132,6 +165,29 @@ const Navbar = () => {
                   </Link>
                 </motion.div>
               ))}
+              {/* Solo muestra el link de login si NO está autenticado */}
+              {!isAuthenticated && (
+                <motion.div
+                  whileHover={{ x: 10, scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Link 
+                    to="/login"
+                    className="mobile-nav-link"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <span className="mobile-nav-icon">🔑</span>
+                    Iniciar Sesión
+                  </Link>
+                </motion.div>
+              )}
+              {/* Si está autenticado, muestra el saludo */}
+              {isAuthenticated && (
+                <div className="user-greeting mobile">
+                  Hola <Link to="/perfil"><strong>{user?.name || user?.username || user?.email}</strong></Link>
+                  <button className="logout-btn" onClick={() => { logout(); setIsMenuOpen(false); }}>Salir</button>
+                </div>
+              )}
             </div>
           </motion.div>
         )}

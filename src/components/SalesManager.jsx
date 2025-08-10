@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { salesService } from '../services/firebaseService';
+import { customerService } from '../services/firebaseService';
+import '../styles/SalesManager.css';
 
 const SalesManager = ({ data, refreshData }) => {
   const [showModal, setShowModal] = useState(false);
@@ -13,13 +15,20 @@ const SalesManager = ({ data, refreshData }) => {
     products: [],
     total: '',
     paymentMethod: '',
-    notes: ''
+    notes: '',
+    folio: '',
+    canjeado: false
   });
+
+  // Generador de folio simple (puedes mejorar la lógica si lo deseas)
+  const generateFolio = () => {
+    return 'FOL-' + Date.now().toString().slice(-6) + '-' + Math.floor(Math.random() * 1000);
+  };
 
   const openModal = (type, sale = null) => {
     setModalType(type);
     setSelectedSale(sale);
-    
+
     if (type === 'edit' && sale) {
       setSaleForm({
         customerId: sale.customerId || '',
@@ -27,12 +36,19 @@ const SalesManager = ({ data, refreshData }) => {
         products: sale.products || [],
         total: sale.total || '',
         paymentMethod: sale.paymentMethod || '',
-        notes: sale.notes || ''
+        notes: sale.notes || '',
+        folio: sale.folio || '',
+        canjeado: sale.canjeado || false
       });
     } else if (type === 'create') {
       resetForm();
+      setSaleForm(prev => ({
+        ...prev,
+        folio: generateFolio(),
+        canjeado: false
+      }));
     }
-    
+
     setShowModal(true);
     setIsSubmitting(false);
   };
@@ -52,17 +68,19 @@ const SalesManager = ({ data, refreshData }) => {
       products: [],
       total: '',
       paymentMethod: '',
-      notes: ''
+      notes: '',
+      folio: '',
+      canjeado: false
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (isSubmitting) return;
     setIsSubmitting(true);
-    
+
     try {
       const saleData = {
         ...saleForm,
@@ -71,14 +89,37 @@ const SalesManager = ({ data, refreshData }) => {
       };
 
       let result;
+      let wasCanjeado = false;
       if (modalType === 'edit') {
+        // Detecta si antes no estaba canjeado y ahora sí
+        const prevSale = selectedSale;
+        wasCanjeado = prevSale.canjeado;
         result = await salesService.update(selectedSale.id, saleData);
       } else {
         saleData.createdAt = new Date();
+        // Si no hay folio, genera uno
+        if (!saleData.folio) saleData.folio = generateFolio();
         result = await salesService.create(saleData);
       }
-      
+
       if (result.success) {
+        // SOLO SUMA LOS PUNTOS SI SE MARCA COMO CANJEADO Y ANTES NO LO ESTABA
+        if (
+          saleForm.canjeado &&
+          (!wasCanjeado || modalType === 'create') &&
+          saleForm.customerId
+        ) {
+          const puntosTotales = saleForm.products.reduce(
+            (acc, prod) =>
+              acc +
+              (Math.max(0, Number(prod.puntos)) * Math.max(1, Number(prod.quantity))),
+            0
+          );
+          console.log('Puntos a asignar al cliente:', puntosTotales); // <-- Depuración
+
+          await customerService.addPoints(saleForm.customerId, puntosTotales);
+        }
+
         await refreshData();
         closeModal();
       } else {
@@ -94,7 +135,7 @@ const SalesManager = ({ data, refreshData }) => {
   const handleDelete = async () => {
     if (!selectedSale || isSubmitting) return;
     setIsSubmitting(true);
-    
+
     try {
       const result = await salesService.delete(selectedSale.id);
       if (result.success) {
@@ -114,7 +155,7 @@ const SalesManager = ({ data, refreshData }) => {
   const addProduct = () => {
     setSaleForm(prev => ({
       ...prev,
-      products: [...prev.products, { name: '', price: '', quantity: 1 }]
+      products: [...prev.products, { name: '', price: '', quantity: 1, puntos: 0 }]
     }));
   };
 
@@ -162,11 +203,13 @@ const SalesManager = ({ data, refreshData }) => {
         <table className="data-table">
           <thead>
             <tr className="table-header">
+              <th className="table-cell">Folio</th>
               <th className="table-cell">Cliente</th>
               <th className="table-cell">Productos</th>
               <th className="table-cell">Total</th>
               <th className="table-cell">Método de Pago</th>
               <th className="table-cell">Fecha</th>
+              <th className="table-cell">Canjeado</th>
               <th className="table-cell">Acciones</th>
             </tr>
           </thead>
@@ -174,6 +217,7 @@ const SalesManager = ({ data, refreshData }) => {
             {data.sales && data.sales.length > 0 ? (
               data.sales.map(sale => (
                 <tr key={sale.id} className="table-row">
+                  <td className="table-cell">{sale.folio || '-'}</td>
                   <td className="table-cell">{sale.customerName || 'Cliente directo'}</td>
                   <td className="table-cell secondary">
                     {sale.products && sale.products.length > 0 
@@ -185,6 +229,9 @@ const SalesManager = ({ data, refreshData }) => {
                   <td className="table-cell secondary">{sale.paymentMethod}</td>
                   <td className="table-cell secondary">
                     {sale.createdAt ? new Date(sale.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}
+                  </td>
+                  <td className="table-cell secondary">
+                    {sale.canjeado ? 'Sí' : 'No'}
                   </td>
                   <td className="table-cell">
                     <div className="action-buttons">
@@ -208,7 +255,7 @@ const SalesManager = ({ data, refreshData }) => {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="table-cell" style={{ textAlign: 'center' }}>
+                <td colSpan="8" className="table-cell" style={{ textAlign: 'center' }}>
                   No hay ventas registradas
                 </td>
               </tr>
@@ -239,6 +286,17 @@ const SalesManager = ({ data, refreshData }) => {
                   <h3 className="modal-title">
                     {modalType === 'edit' ? 'Editar Venta' : 'Nueva Venta'}
                   </h3>
+                  <div className="form-group">
+                    <label className="form-label">Folio</label>
+                    <input
+                      type="text"
+                      value={saleForm.folio}
+                      className="form-input"
+                      readOnly
+                      disabled
+                    />
+                    <small className="input-desc">Este folio puede ser canjeado por el cliente.</small>
+                  </div>
                   
                   <div className="form-group">
                     <label className="form-label">Cliente</label>
@@ -276,34 +334,65 @@ const SalesManager = ({ data, refreshData }) => {
 
                       {saleForm.products.map((product, index) => (
                         <div key={index} className="product-row">
-                          <input
-                            type="text"
-                            value={product.name}
-                            onChange={(e) => updateProduct(index, 'name', e.target.value)}
-                            placeholder="Nombre del producto"
-                            className="product-input"
-                            required
-                            disabled={isSubmitting}
-                          />
-                          <input
-                            type="number"
-                            step="0.01"
-                            value={product.price}
-                            onChange={(e) => updateProduct(index, 'price', e.target.value)}
-                            placeholder="Precio"
-                            className="product-input price"
-                            required
-                            disabled={isSubmitting}
-                          />
-                          <input
-                            type="number"
-                            value={product.quantity}
-                            onChange={(e) => updateProduct(index, 'quantity', e.target.value)}
-                            placeholder="Cantidad"
-                            className="product-input quantity"
-                            required
-                            disabled={isSubmitting}
-                          />
+                          <div className="product-field">
+                            <input
+                              type="text"
+                              value={product.name}
+                              onChange={(e) => updateProduct(index, 'name', e.target.value)}
+                              placeholder="Nombre del producto"
+                              className="product-input"
+                              required
+                              disabled={isSubmitting}
+                            />
+                            <small className="input-desc">Ejemplo: Shampoo, Jabón, etc.</small>
+                          </div>
+                          <div className="product-field">
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={product.price}
+                              onChange={(e) => updateProduct(index, 'price', e.target.value)}
+                              placeholder="Precio"
+                              className="product-input price"
+                              required
+                              disabled={isSubmitting}
+                            />
+                            <small className="input-desc">Precio unitario del producto.</small>
+                          </div>
+                          <div className="product-field">
+                            <input
+                              type="number"
+                              value={product.puntos}
+                              min={0}
+                              step="1"
+                              onChange={e => {
+                                const value = Math.max(0, Number(e.target.value) || 0);
+                                updateProduct(index, 'puntos', value);
+                              }}
+                              placeholder="Puntos"
+                              className="product-input puntos"
+                              required
+                              disabled={isSubmitting}
+                            />
+                            <small className="input-desc">Puntos que este producto otorga al cliente.</small>
+                          </div>
+                          <div className="product-field">
+                            <input
+                              type="number"
+                              value={product.quantity}
+                              min={1}
+                              step="1"
+                              onChange={e => {
+                                const value = Math.max(1, Number(e.target.value) || 1);
+                                updateProduct(index, 'quantity', value);
+                              }}
+                              placeholder="Cantidad"
+                              className="product-input quantity"
+                              required
+                              disabled={isSubmitting}
+                            />
+                            <small className="input-desc">Cantidad vendida de este producto.</small>
+                          </div>
                           <button
                             type="button"
                             onClick={() => removeProduct(index)}
@@ -365,6 +454,41 @@ const SalesManager = ({ data, refreshData }) => {
                       className="form-textarea"
                       disabled={isSubmitting}
                     />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">¿Canjeado?</label>
+                    <select
+                      value={saleForm.canjeado ? 'true' : 'false'}
+                      onChange={e => setSaleForm(prev => ({ ...prev, canjeado: e.target.value === 'true' }))}
+                      className="form-input"
+                      disabled={isSubmitting}
+                    >
+                      <option value="false">No</option>
+                      <option value="true">Sí</option>
+                    </select>
+                    <small className="input-desc">Marca como "Sí" si el cliente ya canjeó sus puntos.</small>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontWeight: 'bold' }}>
+                      Total de puntos a asignar
+                    </label>
+                    <span style={{ fontSize: '1.2em', color: '#2e7d32', fontWeight: 'bold' }}>
+                      {
+                        saleForm.products.reduce(
+                          (acc, prod) => {
+                            const puntos = Number(prod.puntos);
+                            const cantidad = Number(prod.quantity);
+                            // Si puntos o cantidad no son válidos, ignora ese producto
+                            if (isNaN(puntos) || isNaN(cantidad) || puntos < 0 || cantidad < 1) return acc;
+                            return acc + (puntos * cantidad);
+                          },
+                          0
+                        )
+                      }
+                    </span>
+                    <small className="input-desc">Este es el total de puntos que el cliente recibirá al canjear el folio.</small>
                   </div>
 
                   <div className="modal-actions">

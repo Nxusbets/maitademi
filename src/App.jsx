@@ -16,14 +16,10 @@ import Faqs from './pages/faqs';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AdminDashboard from './pages/AdminDashboard';
 import AvisoPrivacidad from './components/AvisoPrivacidad';
-
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
-  
-  if (loading) return <div>Cargando...</div>;
-  
-  return isAuthenticated ? children : <Navigate to="/" />;
-};
+import CustomerProfile from './pages/CustomerProfile';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ProtectedRoute from './components/ProtectedRoute'; // ← Mantén solo esta línea
 
 function App() {
   return (
@@ -52,6 +48,13 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
+              <Route path="/login" element={<Login />} />
+              <Route path="/registro" element={<Register />} />
+              <Route path="/perfil" element={
+                <ProtectedRoute>
+                  <CustomerProfile />
+                </ProtectedRoute>
+              } />
               
             </Routes>
             <Footer />

@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { leadService } from '../services/firebaseService'; // Agregar esta importación
+import { useAuth } from '../contexts/AuthContext';
 import './CustomCake.css';
 
 const CustomCake = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth(); // Obtén el estado de autenticación
   const [formData, setFormData] = useState({
     servings: '',
     flavor: 'vanilla',
@@ -301,59 +303,59 @@ ${formData.budget ? `• Presupuesto aproximado: $${formData.budget} MXN` : ''}
           </div>
         </div>
 
-        <div className="form-section">
-          <h3>Información de Contacto</h3>
-          
-          <div className="form-group">
-            <label>Nombre Completo</label>
-            <input 
-              type="text" 
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              disabled={isSubmitting}
-            />
+        {/* Información de contacto solo si NO está autenticado */}
+        {!isAuthenticated && (
+          <div className="form-section">
+            <h3>Información de Contacto</h3>
+            <div className="form-group">
+              <label>Nombre Completo</label>
+              <input 
+                type="text" 
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                disabled={isSubmitting}
+              />
+            </div>
+            <div className="form-group">
+              <label>Correo Electrónico</label>
+              <input 
+                type="email" 
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                required
+                disabled={isSubmitting}
+                aria-invalid={errors.email ? "true" : "false"}
+              />
+              {errors.email && <span className="error-message">{errors.email}</span>}
+            </div>
+            <div className="form-group">
+              <label>Teléfono</label>
+              <input 
+                type="tel" 
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                disabled={isSubmitting}
+              />
+            </div>
           </div>
+        )}
 
-          <div className="form-group">
-            <label>Correo Electrónico</label>
-            <input 
-              type="email" 
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              required
-              disabled={isSubmitting}
-              aria-invalid={errors.email ? "true" : "false"}
-            />
-            {errors.email && <span className="error-message">{errors.email}</span>}
-          </div>
-
-          <div className="form-group">
-            <label>Teléfono</label>
-            <input 
-              type="tel" 
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-              disabled={isSubmitting}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Presupuesto Aproximado (MXN)</label>
-            <input 
-              type="number" 
-              name="budget"
-              value={formData.budget}
-              onChange={handleChange}
-              placeholder="Opcional"
-              disabled={isSubmitting}
-            />
-          </div>
+        <div className="form-group">
+          <label>Presupuesto Aproximado (MXN)</label>
+          <input 
+            type="number" 
+            name="budget"
+            value={formData.budget}
+            onChange={handleChange}
+            placeholder="Opcional"
+            disabled={isSubmitting}
+          />
         </div>
 
         <motion.button 

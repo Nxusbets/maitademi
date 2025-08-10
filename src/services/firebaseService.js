@@ -8,7 +8,8 @@ import {
   deleteDoc,
   query, 
   orderBy,
-  serverTimestamp 
+  serverTimestamp,
+  where
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
@@ -117,7 +118,35 @@ const createBaseService = (collectionName) => ({
 // Crear servicios específicos para cada colección
 export const productService = createBaseService('products');
 // export const customerService = createBaseService('customers');
-export const salesService = createBaseService('sales');
+export const salesService = {
+  ...createBaseService('sales'),
+  async getByFolio(folio) {
+    const q = query(collection(db, 'sales'), where('folio', '==', folio));
+    const snap = await getDocs(q);
+    if (snap.empty) return { success: false };
+    const doc = snap.docs[0];
+    return { success: true, data: { id: doc.id, ...doc.data() } };
+  },
+  async getByCustomerId(customerId) {
+    try {
+      const q = query(
+        collection(db, 'sales'),
+        where('customerId', '==', customerId),
+        orderBy('createdAt', 'desc')
+      );
+      const snap = await getDocs(q);
+      const purchases = snap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      return { success: true, data: purchases };
+    } catch (error) {
+      console.error('Error getting sales by customerId:', error);
+      return { success: false, error: error.message };
+    }
+  },
+  // update ya existe en createBaseService
+};
 export const expenseService = createBaseService('expenses');
 export const promotionService = createBaseService('promotions');
 export const leadService = createBaseService('leads');
@@ -245,13 +274,28 @@ export const updateLeadStatus = async (leadId, newStatus) => {
 // O si prefieres mantenerlo dentro de customerService:
 export const customerService = {
   ...createBaseService('customers'),
-  async updateLeadStatus(leadId, newStatus) {
+  async create(data) {
+    // Asegura que el campo points exista
+    const customerData = { ...data, points: data.points ?? 0 };
+    return await createBaseService('customers').create(customerData);
+  },
+  async updatePoints(customerId, points) {
+    const customerRef = doc(db, 'customers', customerId);
+    await updateDoc(customerRef, { points });
+    return { success: true };
+  },
+  async login(email, password) {
     try {
-      const leadRef = doc(db, 'leads', leadId);
-      await updateDoc(leadRef, { status: newStatus });
-      return { success: true };
+      const q = query(
+        collection(db, 'customers'),
+        where('email', '==', email),
+        where('password', '==', password)
+      );
+      const snap = await getDocs(q);
+      if (snap.empty) return { success: false, error: 'Credenciales incorrectas' };
+      const doc = snap.docs[0];
+      return { success: true, data: { id: doc.id, ...doc.data() } };
     } catch (error) {
-      console.error('Error updating lead status:', error);
       return { success: false, error: error.message };
     }
   }
