@@ -2677,3 +2677,21 @@
   border: 1px solid red !important;
   background: #f0f0f0 !important;
 }
+
+/* Estilo especial para la columna "¿Qué solicitó?" */
+.table-cell.solicitud {
+  font-style: italic;
+  color: #8e44ad;
+}
+
+.promotion-description {
+  max-width: 100%;
+  max-height: 60px;
+  overflow: auto;
+  word-break: break-word;
+  text-overflow: ellipsis;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  line-height: 1.4;
+  padding-right: 4px;
+}

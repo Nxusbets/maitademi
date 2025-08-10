@@ -197,6 +197,7 @@ Te contactaremos pronto con más detalles y una cotización personalizada.
               <th className="table-cell hide-mobile">Email</th>
               <th className="table-cell">Tipo</th>
               <th className="table-cell hide-mobile">Fecha del Evento</th>
+              <th className="table-cell">¿Qué solicitó?</th> {/* NUEVA COLUMNA */}
               <th className="table-cell">Estado</th>
               <th className="table-cell hide-mobile">Fecha de Solicitud</th>
               <th className="table-cell">Acciones</th>
@@ -209,7 +210,6 @@ Te contactaremos pronto con más detalles y una cotización personalizada.
                   <td className="table-cell">
                     <div className="customer-name">
                       {lead.name}
-                      {/* Mostrar tipo de solicitud como badge */}
                       {lead.type === 'custom_cake_quote' && (
                         <span className="lead-type-badge cake">🍰</span>
                       )}
@@ -223,13 +223,20 @@ Te contactaremos pronto con más detalles y una cotización personalizada.
                   <td className="table-cell">
                     <div className="event-type">
                       {lead.eventType || 'Cotización general'}
-                      {/* Mostrar porciones si es pastel personalizado */}
                       {lead.cakeDetails?.servings && (
                         <small className="servings-info">
                           {lead.cakeDetails.servings} porciones
                         </small>
                       )}
                     </div>
+                  </td>
+                  <td className="table-cell">
+                    {/* Mostrar mensaje, detalles de pastel o ambos */}
+                    {lead.message 
+                      ? lead.message 
+                      : lead.cakeDetails 
+                        ? `Pastel: ${lead.cakeDetails.flavor || ''} ${lead.cakeDetails.servings ? `(${lead.cakeDetails.servings} porciones)` : ''}` 
+                        : 'Sin detalles'}
                   </td>
                   <td className="table-cell secondary hide-mobile">
                     {lead.eventDate ? (
@@ -476,8 +483,14 @@ Te contactaremos pronto con más detalles y una cotización personalizada.
                     </div>
 
                     <div className="detail-group">
-                      <h4>Mensaje del Cliente</h4>
-                      <p>{selectedLead?.message || 'Sin mensaje adicional'}</p>
+                      <h4>¿Qué solicitó?</h4>
+                      <p>
+                        {selectedLead?.message 
+                          ? selectedLead.message 
+                          : selectedLead?.cakeDetails 
+                            ? `Pastel: ${selectedLead.cakeDetails.flavor || ''} ${selectedLead.cakeDetails.servings ? `(${selectedLead.cakeDetails.servings} porciones)` : ''}` 
+                            : 'Sin detalles'}
+                      </p>
                     </div>
 
                     <div className="detail-group">

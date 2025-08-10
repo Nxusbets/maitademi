@@ -5,7 +5,8 @@ import { useFirebaseData } from '../hooks/useFirebaseData';
 import { 
   productService, 
   customerService, 
-  salesService 
+  salesService,
+  leadService
 } from '../services/firebaseService';
 import PromotionsManager from '../components/PromotionsManager';
 import ExpenseManager from '../components/ExpenseManager';
@@ -13,6 +14,7 @@ import SalesManager from '../components/SalesManager';
 import LeadsManager from '../components/LeadsManager';
 import ProductsManager from '../components/ProductsManager';
 import ImageUploader from '../components/ImageUploader';
+import CreationsManager from '../components/CreationsManager';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -42,6 +44,7 @@ const AdminDashboard = () => {
   const [productImage, setProductImage] = useState('');
   const [selectedLead, setSelectedLead] = useState(null); // Nuevo estado para el lead seleccionado
   const [showSaleModal, setShowSaleModal] = useState(false); // Nuevo estado para mostrar el modal de venta
+  const [selectedCustomer, setSelectedCustomer] = useState(null); // Nuevo estado para el cliente seleccionado
 
   // CATEGORÍAS EXISTENTES
   const existingCategories = Array.from(
@@ -90,25 +93,28 @@ const AdminDashboard = () => {
 
   const handleCustomerSubmit = async (e) => {
     e.preventDefault();
-    
     if (isSubmitting) {
       console.log('Ya se está enviando un formulario...');
       return;
     }
-
     setIsSubmitting(true);
-    
     try {
-      const result = await customerService.create(newCustomer);
-      if (result.success) {
-        await refreshData();
-        closeModal();
-        resetCustomerForm();
+      if (editMode && selectedCustomer) {
+        await customerService.update(selectedCustomer.id, newCustomer);
+      } else {
+        const result = await customerService.create(newCustomer);
+        if (result.success) {
+          resetCustomerForm();
+        }
       }
+      await refreshData();
+      closeModal();
     } catch (error) {
-      console.error('Error creating customer:', error);
+      console.error('Error creating/updating customer:', error);
     } finally {
       setIsSubmitting(false);
+      setSelectedCustomer(null);
+      setEditMode(false);
     }
   };
 
@@ -246,6 +252,21 @@ const AdminDashboard = () => {
     }
   };
 
+  // Eliminar solicitud (lead)
+  const handleDeleteLead = async (leadId) => {
+    if (window.confirm('¿Seguro que deseas eliminar esta solicitud?')) {
+      setIsSubmitting(true);
+      try {
+        await leadService.delete(leadId);
+        await refreshData();
+      } catch (error) {
+        alert('Error al eliminar la solicitud');
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
+
   const updateLeadStatus = async (leadId, newStatus) => {
     setIsSubmitting(true);
     try {
@@ -257,6 +278,37 @@ const AdminDashboard = () => {
       setIsSubmitting(false);
     }
   };
+
+  // Guardar cliente automáticamente si es pastel personalizado
+  const autoCreateCustomerFromLead = async (lead) => {
+    if (lead.type === 'custom_cake_quote' && lead.email) {
+      const exists = data.customers.some(c => c.email === lead.email);
+      if (!exists) {
+        const customerData = {
+          name: lead.name,
+          email: lead.email,
+          phone: lead.phone || '',
+          address: lead.address || '',
+          birthDate: '',
+          preferences: `Pastel personalizado: ${lead.cakeDetails?.flavor || ''}, ${lead.cakeDetails?.servings || ''} porciones.`,
+          source: 'Solicitud pastel personalizado',
+          originalLeadId: lead.id
+        };
+        await customerService.create(customerData);
+        await refreshData();
+      }
+    }
+  };
+
+  React.useEffect(() => {
+    if (data.leads && data.customers) {
+      // Ejecuta para cada lead
+      data.leads.forEach(lead => {
+        autoCreateCustomerFromLead(lead);
+      });
+    }
+    // eslint-disable-next-line
+  }, [data.leads, data.customers]);
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -486,8 +538,8 @@ const AdminDashboard = () => {
               </button>
             </div>
 
-            <div className="table-container">
-              <table className="data-table">
+            <div className="table-container" style={{ overflowX: 'auto' }}>
+              <table className="data-table" style={{ minWidth: 700 }}>
                 <thead>
                   <tr className="table-header">
                     <th className="table-cell">Nombre</th>
@@ -495,6 +547,7 @@ const AdminDashboard = () => {
                     <th className="table-cell">Teléfono</th>
                     <th className="table-cell">Dirección</th>
                     <th className="table-cell">Fecha de Nacimiento</th>
+                    <th className="table-cell" style={{ minWidth: 120 }}>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -505,6 +558,68 @@ const AdminDashboard = () => {
                       <td className="table-cell secondary">{customer.phone}</td>
                       <td className="table-cell secondary">{customer.address}</td>
                       <td className="table-cell secondary">{customer.birthDate || 'N/A'}</td>
+                      <td className="table-cell" style={{ minWidth: 120 }}>
+                        <button
+                          className="edit-button"
+                          style={{
+                            padding: '6px 10px',
+                            marginRight: 8,
+                            color: '#3498db',
+                            border: '1px solid #ccc',
+                            background: '#f9f9f9',
+                            borderRadius: 6,
+                            cursor: 'pointer',
+                            fontSize: '1rem'
+                          }}
+                          onClick={() => {
+                            setNewCustomer({
+                              name: customer.name || '',
+                              email: customer.email || '',
+                              phone: customer.phone || '',
+                              address: customer.address || '',
+                              birthDate: customer.birthDate || '',
+                              preferences: customer.preferences || ''
+                            });
+                            setEditMode(true);
+                            setSelectedCustomer(customer); // <-- Asegúrate de guardar el cliente editado
+                            setModalType('customer');
+                            setShowModal(true);
+                            setIsSubmitting(false);
+                          }}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className="delete-button"
+                          style={{
+                            padding: '6px 10px',
+                            color: '#e74c3c',
+                            border: '1px solid #ccc',
+                            background: '#f9f9f9',
+                            borderRadius: 6,
+                            cursor: 'pointer',
+                            fontSize: '1rem'
+                          }}
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            if (isSubmitting) return;
+                            if (window.confirm('¿Seguro que deseas eliminar este cliente?')) {
+                              setIsSubmitting(true);
+                              try {
+                                await customerService.delete(customer.id);
+                                await refreshData();
+                              } catch (error) {
+                                alert('Error al eliminar el cliente');
+                              } finally {
+                                setIsSubmitting(false);
+                              }
+                            }
+                          }}
+                          disabled={isSubmitting}
+                        >
+                          Eliminar
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -533,32 +648,39 @@ const AdminDashboard = () => {
                 <thead>
                   <tr className="table-header">
                     <th className="table-cell">Nombre</th>
-                    <th className="table-cell">Correo</th>
-                    <th className="table-cell">Evento</th>
+                    <th className="table-cell">Teléfono</th>
+                    <th className="table-cell">¿Qué solicitó?</th>
                     <th className="table-cell">Estado</th>
-                    <th className="table-cell">Acciones</th>
+                    <th className="table-cell">Eliminar</th> {/* Nueva columna */}
                   </tr>
                 </thead>
                 <tbody>
                   {data.leads.map(lead => (
                     <tr key={lead.id} className="table-row">
                       <td className="table-cell">{lead.name}</td>
-                      <td className="table-cell">{lead.email}</td>
-                      <td className="table-cell">{lead.eventType || 'Cotización'}</td>
+                      <td className="table-cell">{lead.phone}</td>
+                      <td className="table-cell">
+                        {lead.message 
+                          ? lead.message 
+                          : lead.cakeDetails 
+                            ? `Pastel: ${lead.cakeDetails.flavor || ''} ${lead.cakeDetails.servings ? `(${lead.cakeDetails.servings} porciones)` : ''}` 
+                            : 'Sin detalles'}
+                      </td>
                       <td className="table-cell">
                         <select
                           value={lead.status || 'new'}
                           onChange={async (e) => {
                             const newStatus = e.target.value;
                             if (newStatus === 'completed') {
-                              setSelectedLead(lead); // Nuevo estado para saber qué lead se está completando
-                              setShowSaleModal(true); // Nuevo estado para mostrar el modal de venta
+                              setSelectedLead(lead);
+                              setShowSaleModal(true);
                             } else {
                               await updateLeadStatus(lead.id, newStatus);
                             }
                           }}
-                          className="form-input"
+                          className="form-input status-select"
                           disabled={isSubmitting}
+                          style={{ minWidth: 140, padding: '8px' }}
                         >
                           <option value="new">Nueva</option>
                           <option value="in_progress">En Proceso</option>
@@ -567,7 +689,14 @@ const AdminDashboard = () => {
                         </select>
                       </td>
                       <td className="table-cell">
-                        {/* Puedes agregar más acciones aquí si lo deseas */}
+                        <button
+                          className="delete-button"
+                          onClick={() => handleDeleteLead(lead.id)}
+                          disabled={isSubmitting}
+                          style={{ padding: '6px 12px', color: '#e74c3c', border: 'none', background: 'none', cursor: 'pointer' }}
+                        >
+                          Eliminar
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -575,6 +704,14 @@ const AdminDashboard = () => {
               </table>
             </div>
           </div>
+        );
+
+      case 'creations':
+        return (
+          <CreationsManager
+            creations={data.creations || []}
+            refreshData={refreshData}
+          />
         );
 
       default:
@@ -630,7 +767,8 @@ const AdminDashboard = () => {
             { id: 'customers', label: 'Clientes', icon: '👥' },
             { id: 'sales', label: 'Ventas', icon: '💰' },
             { id: 'expenses', label: 'Gastos', icon: '📉' },
-            { id: 'promotions', label: 'Promociones', icon: '📧' }
+            { id: 'promotions', label: 'Promociones', icon: '📧' },
+            { id: 'creations', label: 'Nuestras Creaciones', icon: '🖼️' } // <-- Nueva opción
           ].map(tab => (
             <button
               key={tab.id}

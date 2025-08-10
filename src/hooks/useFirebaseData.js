@@ -4,9 +4,10 @@ import {
   customerService, 
   salesService, 
   expenseService,
-  promotionService, // Agregar esta línea
+  promotionService,
   leadService
 } from '../services/firebaseService';
+import { creationService } from '../services/creationService'; // <-- Importa el servicio
 
 export const useFirebaseData = () => {
   const [data, setData] = useState({
@@ -14,8 +15,9 @@ export const useFirebaseData = () => {
     customers: [],
     sales: [],
     expenses: [],
-    promotions: [], // Agregar esta línea
-    leads: []
+    promotions: [],
+    leads: [],
+    creations: [] // <-- Agrega creaciones
   });
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -36,15 +38,17 @@ export const useFirebaseData = () => {
         customersResult, 
         salesResult, 
         expensesResult, 
-        promotionsResult, // Agregar esta línea
-        leadsResult
+        promotionsResult,
+        leadsResult,
+        creationsResult // <-- Agrega creaciones
       ] = await Promise.all([
         productService.getAll(),
         customerService.getAll(),
         salesService.getAll(),
         expenseService.getAll(),
-        promotionService.getAll(), // Agregar esta línea
-        leadService.getAll()
+        promotionService.getAll(),
+        leadService.getAll(),
+        creationService.getAll() // <-- Llama a getAll
       ]);
 
       // Extraer los datos de los resultados
@@ -54,6 +58,7 @@ export const useFirebaseData = () => {
       const expenses = expensesResult.success ? expensesResult.data : [];
       const promotions = promotionsResult.success ? promotionsResult.data : []; // Agregar esta línea
       const leads = leadsResult.success ? leadsResult.data : [];
+      const creations = creationsResult && creationsResult.success ? creationsResult.data : []; // <-- Extrae creaciones
 
       setData({
         products,
@@ -61,7 +66,8 @@ export const useFirebaseData = () => {
         sales,
         expenses,
         promotions, // Agregar esta línea
-        leads
+        leads,
+        creations // <-- Guarda creaciones
       });
 
       // Calcular estadísticas

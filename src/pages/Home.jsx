@@ -13,9 +13,11 @@ import { motion } from 'framer-motion';
 import React from 'react';
 import Welcome from '../components/Welcome';
 import HomePromotions from '../components/HomePromotions'; // <-- Agrega esta línea
+import { useFirebaseData } from '../hooks/useFirebaseData';
 
 const Home = () => {
   const { tokens } = useTheme();
+  const { data } = useFirebaseData(); // <-- Usa el hook para obtener creaciones
 
   return (
     <div className="home">
@@ -78,15 +80,18 @@ const Home = () => {
               visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
             }}
           >
-            {[
-              "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748116064/1000074648_hfm3wl.jpg",
-              "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748116064/1000074654_orzqu7.jpg",
-              "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748116064/1000075448_hu6074.jpg",
-            ].map((src, index) => (
+            {(data.creations && data.creations.length > 0
+              ? data.creations
+              : [
+                  { image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748116064/1000074648_hfm3wl.jpg", title: "Pastel 1" },
+                  { image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748116064/1000074654_orzqu7.jpg", title: "Pastel 2" },
+                  { image: "https://res.cloudinary.com/ddi0sl10o/image/upload/v1748116064/1000075448_hu6074.jpg", title: "Pastel 3" }
+                ]
+            ).map((creation, index) => (
               <motion.img
                 key={index}
-                src={src}
-                alt={`Pastel ${index + 1}`}
+                src={creation.image}
+                alt={creation.title || `Pastel ${index + 1}`}
                 className="gallery-image"
                 whileHover={{ scale: 1.1, boxShadow: "0px 8px 20px rgba(0, 0, 0, 0.2)" }}
                 initial={{ opacity: 0, y: 20 }}
